@@ -1,0 +1,27 @@
+- Piece class
+    - pawn or king bools
+    - color bools
+    - position
+    - flag ( other list)
+
+Pseudo
+
+gui - > computer icons
+
+initalize board (list and dictionnary as board)
+
+while there are moves
+        if human turn
+            no valid moves you lose
+            wait for input
+            if valid move by checking board
+                update board (removals, king update)
+            switch playa
+
+        if computer turn
+            get possible moves
+            if no possible move you lose
+                - stop when jump found
+                    - look for consec jump
+                no jump, pick random move
+            switch playa
