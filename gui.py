@@ -54,8 +54,7 @@ j = 0
 while j < 3:
     i = 0
     while i < 8:
-        print(str(j) + " " + str(i))
-        if i % 2 == j % 2:
+        if i % 2 != j % 2:
             piece = Piece(is_white=False, pos=(i,j))
             board[(i, j)] = piece
             black_pieces.append(piece)
@@ -65,14 +64,15 @@ while j < 3:
 # initializing white pieces
 i = 0
 j = 5
-while i < 8:
-    while j < 8:
-        if i % 2 == j % 2:
+while j < 8:
+    i = 0
+    while i < 8:
+        if i % 2 != j % 2:
             piece = Piece(is_white=True, pos=(i,j))
             board[(i, j)] = piece
             white_pieces.append(piece)
-        j += 1
-    i += 1
+        i += 1
+    j += 1
 
 def display(text):
     if text != "":
@@ -87,18 +87,23 @@ pcolor = 0
 # Get turn?
 is_cpu_turn = True
 
+show_numbers = False
 while 1:
     # TODO: GET TURN
     is_cpu_turn = False
     for event in pygame.event.get():
+        if pygame.key.get_mods() & pygame.KMOD_ALT:
+            show_numbers = True
+        else:
+            show_numbers = False
         if event.type == pygame.QUIT: sys.exit()
         if event.type == pygame.MOUSEBUTTONUP:
             if inmenu :
                 pos = pygame.mouse.get_pos()
-                if(pos[0]<bheight/2 - 10):
+                if pos[0]<bheight/2 - 10:
                     # HUMAN IS WHITE
                     pass
-                elif(pos[0]>bheight/2 + 10):
+                elif  pos[0]>bheight/2 + 10 :
                     # HUMAN IS BLACK
                     pass
                 inmenu = False
@@ -113,7 +118,7 @@ while 1:
                     elif typing_text == "undo" or typing_text == "u":
                         pass
                     else :
-                        display(typing_text)
+                        display(typing_text.replace(" ",""))
                         try:
                             move_coords = typing_text.split(" ")
                             coord1 = int(move_coords[0])# move([0],[1])
@@ -136,9 +141,27 @@ while 1:
         else :
             # -- DRAWING BOARD ---
             for piece in black_pieces:
-                screen.blit(black_pc_img, (piece.pos[0]*pcwidth, bheight - (piece.pos[1]+1)*pcheight))
-            # --- CONSOLE TEXT ---
+                # TODO: Check if king
+                screen.blit(black_pc_img, (piece.pos[0]*pcwidth, (piece.pos[1])*pcheight))
+            for piece in white_pieces:
+                screen.blit(white_pc_img, (piece.pos[0]*pcwidth, (piece.pos[1])*pcheight))
+
+            # --- TEXT ON SCREEN ---
+            hintfnt = pygame.font.SysFont("monotype", font_size)
             fnt = pygame.font.SysFont("Calibri", font_size)
+            if show_numbers:
+                count = 1
+                j = 0
+                offset = 5
+                while j < 8:
+                    i = 0
+                    while i < 8:
+                        if i % 2 != j % 2:
+                            text = hintfnt.render(str(count), 1, (255, 20 , 20))
+                            screen.blit(text, (i*pcwidth+ offset, j*pcheight + offset))
+                            count += 1
+                        i += 1
+                    j += 1
             i = 0
             while i < max_display - 1 and i < len(text_display):
                 text = fnt.render("> " + text_display[i], 1, (0, 0, 0))
