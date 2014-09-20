@@ -48,31 +48,34 @@ white_pieces = list()
 # initializing board
 
 # initializing black pieces
-i = 0
-j = 0
+x = 0
+y = 0
 
-while j < 3:
-    i = 0
-    while i < 8:
-        print(str(j) + " " + str(i))
-        if i % 2 == j % 2:
-            piece = Piece(is_white=False, pos=(i,j))
-            board[(i, j)] = piece
+while y < 3:
+    x = 0
+    while x < 8:
+
+        if x % 2 != y % 2:
+            print("(" + str(x) + " " + str(y) + ")")
+            piece = Piece(is_white=False, pos=(x,y))
+            board[(x, y)] = piece
             black_pieces.append(piece)
-        i += 1
-    j += 1
+        x += 1
+    y += 1
 
 # initializing white pieces
-i = 0
-j = 5
-while i < 8:
-    while j < 8:
-        if i % 2 == j % 2:
-            piece = Piece(is_white=True, pos=(i,j))
-            board[(i, j)] = piece
+x = 0
+y = 5
+while y < 8:
+    x = 0
+    while x < 8:
+        if x % 2 != y % 2:
+            print("(" + str(x) + " " + str(y) + ")")
+            piece = Piece(is_white=True, pos=(x,y))
+            board[(x, y)] = piece
             white_pieces.append(piece)
-        j += 1
-    i += 1
+        x += 1
+    y += 1
 
 def display(text):
     if text != "":
@@ -136,7 +139,10 @@ while 1:
         else :
             # -- DRAWING BOARD ---
             for piece in black_pieces:
-                screen.blit(black_pc_img, (piece.pos[0]*pcwidth, bheight - (piece.pos[1]+1)*pcheight))
+                screen.blit(black_pc_img, (piece.pos[0]*pcwidth, (piece.pos[1])*pcheight))
+            for piece in white_pieces:
+                screen.blit(white_pc_img, (piece.pos[0]*pcwidth, (piece.pos[1])*pcheight))
+
             # --- CONSOLE TEXT ---
             fnt = pygame.font.SysFont("Calibri", font_size)
             i = 0
