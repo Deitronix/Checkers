@@ -1,7 +1,6 @@
 __author__ = 'Kokouvi Djogbessi'
 
 import sys, pygame, innerLogic
-from piece import Piece
 from board import Board
 pygame.init()
 
@@ -85,11 +84,8 @@ while 1:
                         try:
                             move_coords = typing_text.split(" ")
                             coord1 = int(move_coords[0])# move([0],[1])
-                            print(coord1)
                             coord2 = int(move_coords[1])
-                            print(coord2)
 
-                            innerLogic.humanMove(move_coords)
                         except:
                             display("Invalid command")
                         typing_text = ""
