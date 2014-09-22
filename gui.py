@@ -18,12 +18,13 @@ menu = pygame.image.load(img_folder+"main_menu.png")
 menu = pygame.transform.scale(menu, bsize)
 menurect = menu.get_rect()
 console = pygame.image.load(img_folder+"consolebg.png")
-console = pygame.transform.scale(console, (pwidth, wheight - pheight))
+console = pygame.transform.scale(console, (pwidth-1, wheight-1))
 white_pc_img = pygame.image.load(img_folder+"white_piece.png")
 white_pc_img = pygame.transform.scale(white_pc_img, pcsize)
 black_pc_img = pygame.image.load(img_folder+"black_piece.png")
 black_pc_img = pygame.transform.scale(black_pc_img, pcsize)
-
+selection = pygame.image.load(img_folder+"selection.png")
+selection = pygame.transform.scale(selection, pcsize)
 h_play = pygame.image.load(img_folder+"human_play.png")
 h_play = pygame.transform.scale(h_play, psize)
 h_play.get_rect()
@@ -32,8 +33,8 @@ cpu_play = pygame.transform.scale(cpu_play, psize)
 cpu_play.get_rect()
 
 # ------ TEXT VARS ---------
-max_display = 10
-font_size = 25
+max_display = 12
+font_size = 23
 theight = (wheight - pheight) // (max_display)
 tsize = twidth, theight = pwidth, theight
 typing_text = str()
@@ -80,14 +81,23 @@ def display(text):
         if(len(text_display)>max_display - 1):
             del text_display[0]
 
+def collide(piece_pos, mouse_pos):
+    """Rough method to check if the mouses position is in for a piece"""
 
+    return ((mouse_pos[0] < piece_pos[0] * pcwidth + pcwidth) and (mouse_pos[0] > piece_pos[0]
+                                                                   *pcwidth) and
+    (mouse_pos[1] < piece_pos[1]* pcheight + pcheight) and (mouse_pos[1] > piece_pos[1]* pcheight))
 
 inmenu = True # displays the menu if True
 pcolor = 0
 # Get turn?
 is_cpu_turn = True
-
+player_is_white = False
 show_numbers = False
+clicked_piece = None
+piece_is_selected = False
+selected_number = 0
+
 while 1:
     # TODO: GET TURN
     is_cpu_turn = False
@@ -98,15 +108,38 @@ while 1:
             show_numbers = False
         if event.type == pygame.QUIT: sys.exit()
         if event.type == pygame.MOUSEBUTTONUP:
-            if inmenu :
+            if inmenu:
                 pos = pygame.mouse.get_pos()
                 if pos[0]<bheight/2 - 10:
                     # HUMAN IS WHITE
-                    pass
+                    player_is_white = True
                 elif  pos[0]>bheight/2 + 10 :
                     # HUMAN IS BLACK
-                    pass
+                    player_is_white = False
                 inmenu = False
+            else:
+                pos = pygame.mouse.get_pos()
+                if boardrect.collidepoint(pos):
+                    clicked_piece = []
+                    if player_is_white:
+                        clicked_piece = [p for p in white_pieces if collide(p.pos, pos)]
+                    else:
+                        clicked_piece = [p for p in black_pieces if collide(p.pos, pos)]
+                    if piece_is_selected:
+                        if not len(clicked_piece)<0:
+                            selected_number = 0
+                            piece_is_selected = False
+                        else:
+                            new_selection = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
+                            if new_selection == selected_number:
+                                pass
+                            else:
+                                selected_number = new_selection
+                    elif len(clicked_piece):
+                        selected_number = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
+                        typing_text += str(selected_number) + " "
+                        piece_is_selected = True
+
         if event.type == pygame.KEYDOWN:
             if not is_cpu_turn:
                 char = event.unicode
@@ -117,7 +150,7 @@ while 1:
                         sys.exit(0)
                     elif typing_text == "undo" or typing_text == "u":
                         pass
-                    else :
+                    else:
                         display(typing_text.replace(" ",""))
                         try:
                             move_coords = typing_text.split(" ")
@@ -134,12 +167,15 @@ while 1:
     screen.blit(boardimg, boardrect)
     if inmenu:
         screen.blit(menu, menurect)
-    else :
-        screen.blit(console, (bwidth, pheight))
+    else:
+        screen.blit(console, (bwidth, 0))
         if is_cpu_turn:
             screen.blit(cpu_play, (bwidth, 0))
-        else :
-            # -- DRAWING BOARD ---
+        else:
+            if piece_is_selected:
+                screen.blit(selection, (clicked_piece[0].pos[0]*pcwidth,
+                clicked_piece[0].pos[1]*pcheight))
+            # -- DRAWING PIECES ---
             for piece in black_pieces:
                 # TODO: Check if king
                 screen.blit(black_pc_img, (piece.pos[0]*pcwidth, (piece.pos[1])*pcheight))
@@ -163,11 +199,12 @@ while 1:
                         i += 1
                     j += 1
             i = 0
+
             while i < max_display - 1 and i < len(text_display):
                 text = fnt.render("> " + text_display[i], 1, (0, 0, 0))
                 screen.blit(text, (bwidth, (i)*theight + pheight))
                 i += 1
-            text = fnt.render(">>"+typing_text+"_", 1, (255, 255, 0))
+            text = fnt.render(">> "+typing_text+"_", 1, (0, 0, 0))
             screen.blit(text, (bwidth, (max_display-1)*theight + pheight))
             screen.blit(h_play, (bwidth, 0))
     pygame.display.flip()
