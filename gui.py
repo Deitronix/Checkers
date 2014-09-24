@@ -1,30 +1,22 @@
 __author__ = 'Kokouvi Djogbessi'
 
 import sys, pygame
-from piece import Piece
+from board import Board
 pygame.init()
 
 img_folder = "img/"
 bsize = bwidth, bheight = 600, 600
 psize = pwidth, pheight = 235, 170
 wsize = wwidth, wheight = bwidth + pwidth, bheight
-pcsize = pcwidth, pcheight = bwidth//8, bheight//8
 
-screen = pygame.display.set_mode(wsize, pygame.NOFRAME)
-boardimg = pygame.image.load(img_folder+"board.png")
-boardimg = pygame.transform.scale(boardimg, bsize)
-boardrect = boardimg.get_rect()
+screen = pygame.display.set_mode(wsize)
+
 menu = pygame.image.load(img_folder+"main_menu.png")
 menu = pygame.transform.scale(menu, bsize)
 menurect = menu.get_rect()
 console = pygame.image.load(img_folder+"consolebg.png")
-console = pygame.transform.scale(console, (pwidth-1, wheight-1))
-white_pc_img = pygame.image.load(img_folder+"white_piece.png")
-white_pc_img = pygame.transform.scale(white_pc_img, pcsize)
-black_pc_img = pygame.image.load(img_folder+"black_piece.png")
-black_pc_img = pygame.transform.scale(black_pc_img, pcsize)
-selection = pygame.image.load(img_folder+"selection.png")
-selection = pygame.transform.scale(selection, pcsize)
+console = pygame.transform.scale(console, (pwidth, wheight - pheight))
+
 h_play = pygame.image.load(img_folder+"human_play.png")
 h_play = pygame.transform.scale(h_play, psize)
 h_play.get_rect()
@@ -43,37 +35,11 @@ text_display.append("Welcome !")
 text_display.append("Enter your moves")
 
 # --GET VARS FROM MAIN --
-board = dict()
+board = Board(screen, bwidth, bheight)
 black_pieces = list()
 white_pieces = list()
 # initializing board
 
-# initializing black pieces
-i = 0
-j = 0
-
-while j < 3:
-    i = 0
-    while i < 8:
-        if i % 2 != j % 2:
-            piece = Piece(is_white=False, pos=(i,j))
-            board[(i, j)] = piece
-            black_pieces.append(piece)
-        i += 1
-    j += 1
-
-# initializing white pieces
-i = 0
-j = 5
-while j < 8:
-    i = 0
-    while i < 8:
-        if i % 2 != j % 2:
-            piece = Piece(is_white=True, pos=(i,j))
-            board[(i, j)] = piece
-            white_pieces.append(piece)
-        i += 1
-    j += 1
 
 def display(text):
     if text != "":
@@ -156,34 +122,27 @@ while 1:
                             move_coords = typing_text.split(" ")
                             coord1 = int(move_coords[0])# move([0],[1])
                             coord2 = int(move_coords[1])
-                        except:
-                            display("Invalid command")
+                            board.humanMove((coord1, coord2))
+                        except Exception as exp:
+                            display("Invalid command - %s" %str(exp))
+                            print (exp)
                         typing_text = ""
+                        #innerLogic.humanMove(move_coords)
                 if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
                     typing_text = typing_text[:-1]
                     typing_text = typing_text[:-1]
 
 
-    screen.blit(boardimg, boardrect)
+    board.draw()
     if inmenu:
         screen.blit(menu, menurect)
     else:
         screen.blit(console, (bwidth, 0))
         if is_cpu_turn:
             screen.blit(cpu_play, (bwidth, 0))
-        else:
-            if piece_is_selected:
-                screen.blit(selection, (clicked_piece[0].pos[0]*pcwidth,
-                clicked_piece[0].pos[1]*pcheight))
-            # -- DRAWING PIECES ---
-            for piece in black_pieces:
-                # TODO: Check if king
-                screen.blit(black_pc_img, (piece.pos[0]*pcwidth, (piece.pos[1])*pcheight))
-            for piece in white_pieces:
-                screen.blit(white_pc_img, (piece.pos[0]*pcwidth, (piece.pos[1])*pcheight))
-
-            # --- TEXT ON SCREEN ---
-            hintfnt = pygame.font.SysFont("monotype", font_size)
+        else :
+            board.draw()
+            # --- CONSOLE TEXT ---
             fnt = pygame.font.SysFont("Calibri", font_size)
             if show_numbers:
                 count = 1
