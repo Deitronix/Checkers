@@ -1,6 +1,6 @@
 __author__ = 'Kokouvi Djogbessi'
 
-import sys, pygame, innerLogic
+import sys, pygame
 from board import Board
 pygame.init()
 
@@ -85,9 +85,10 @@ while 1:
                             move_coords = typing_text.split(" ")
                             coord1 = int(move_coords[0])# move([0],[1])
                             coord2 = int(move_coords[1])
-
-                        except:
-                            display("Invalid command")
+                            board.humanMove((coord1, coord2))
+                        except Exception as exp:
+                            display("Invalid command - %s" %str(exp))
+                            print (exp)
                         typing_text = ""
                         #innerLogic.humanMove(move_coords)
                 if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
