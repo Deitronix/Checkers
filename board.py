@@ -1,3 +1,4 @@
+
 __author__ = 'Hannah Saloiye'
 
 from piece import Piece
@@ -61,6 +62,8 @@ class Board:
         self.screen = screen
         self.width = width
         self.height = height
+        self.pcwidth = width//8
+        self.pcheight = height//8
 
         self.boardimg = pygame.image.load(self.img_folder+"board.png")
         self.boardimg = pygame.transform.scale(self.boardimg, (width,height))
@@ -76,7 +79,6 @@ class Board:
             while x < 8:
 
                 if x % 2 != y % 2:
-                    print("(" + str(x) + " " + str(y) + ")")
                     piece = Piece(screen=self.screen, is_white=False, pos=(x,y), width=self.width//8, height=self.height//8)
                     self.locations[(x, y)] = piece
                     self.black_pieces.append(piece)
@@ -90,22 +92,22 @@ class Board:
             x = 0
             while x < 8:
                 if x % 2 != y % 2:
-                    print("(" + str(x) + " " + str(y) + ")")
                     piece = Piece(screen = self.screen, is_white=True, pos=(x,y), width=self.width//8, height=self.height//8)
                     self.locations[(x, y)] = piece
                     self.white_pieces.append(piece)
                 x += 1
             y += 1
 
-    def draw(self):
+    def draw(self, inmenu):
             # -- DRAWING BOARD ---
             self.screen.blit(self.boardimg, self.boardrect)
-            for piece in self.black_pieces:
-                piece.draw()
-            for piece in self.white_pieces:
-                #self.screen.blit(self.white_pc_img, (piece.pos[0]*self.width, (piece.pos[1])*self.height))
-                 piece.draw()
-            self.screen.blit(self.star, (0, 0))
+            if not inmenu:
+                for piece in self.black_pieces:
+                    piece.draw()
+                for piece in self.white_pieces:
+                    #self.screen.blit(self.white_pc_img, (piece.pos[0]*self.width, (piece.pos[1])*self.height))
+                    piece.draw()
+                self.screen.blit(self.star, (0, 0))
 
     def validateStart(self, boardLocation):
         print("in validate Start")
@@ -133,3 +135,6 @@ class Board:
         else:
             raise Exception ("Invalid human move")
             print('invalid move!')
+
+    def collidepoint(self, pos):
+        return self.boardrect.collidepoint(pos)

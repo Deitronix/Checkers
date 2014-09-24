@@ -9,13 +9,13 @@ bsize = bwidth, bheight = 600, 600
 psize = pwidth, pheight = 235, 170
 wsize = wwidth, wheight = bwidth + pwidth, bheight
 
-screen = pygame.display.set_mode(wsize)
+screen = pygame.display.set_mode(wsize, pygame.NOFRAME)
 
 menu = pygame.image.load(img_folder+"main_menu.png")
 menu = pygame.transform.scale(menu, bsize)
 menurect = menu.get_rect()
 console = pygame.image.load(img_folder+"consolebg.png")
-console = pygame.transform.scale(console, (pwidth, wheight - pheight))
+console = pygame.transform.scale(console, (pwidth, wheight))
 
 h_play = pygame.image.load(img_folder+"human_play.png")
 h_play = pygame.transform.scale(h_play, psize)
@@ -50,9 +50,9 @@ def display(text):
 def collide(piece_pos, mouse_pos):
     """Rough method to check if the mouses position is in for a piece"""
 
-    return ((mouse_pos[0] < piece_pos[0] * pcwidth + pcwidth) and (mouse_pos[0] > piece_pos[0]
+    return ((mouse_pos[0] < piece_pos[0] * board.pcwidth + board.pcwidth) and (mouse_pos[0] > piece_pos[0]
                                                                    *pcwidth) and
-    (mouse_pos[1] < piece_pos[1]* pcheight + pcheight) and (mouse_pos[1] > piece_pos[1]* pcheight))
+    (mouse_pos[1] < piece_pos[1]* board.pcheight + board.pcheight) and (mouse_pos[1] > piece_pos[1]* board.pcheight))
 
 inmenu = True # displays the menu if True
 pcolor = 0
@@ -85,7 +85,7 @@ while 1:
                 inmenu = False
             else:
                 pos = pygame.mouse.get_pos()
-                if boardrect.collidepoint(pos):
+                if board.collidepoint(pos):
                     clicked_piece = []
                     if player_is_white:
                         clicked_piece = [p for p in white_pieces if collide(p.pos, pos)]
@@ -133,7 +133,7 @@ while 1:
                     typing_text = typing_text[:-1]
 
 
-    board.draw()
+    board.draw(inmenu)
     if inmenu:
         screen.blit(menu, menurect)
     else:
@@ -141,9 +141,10 @@ while 1:
         if is_cpu_turn:
             screen.blit(cpu_play, (bwidth, 0))
         else :
-            board.draw()
+            board.draw(inmenu)
             # --- CONSOLE TEXT ---
             fnt = pygame.font.SysFont("Calibri", font_size)
+            hintfnt = pygame.font.SysFont("monotype", font_size)
             if show_numbers:
                 count = 1
                 j = 0
@@ -153,7 +154,7 @@ while 1:
                     while i < 8:
                         if i % 2 != j % 2:
                             text = hintfnt.render(str(count), 1, (255, 20 , 20))
-                            screen.blit(text, (i*pcwidth+ offset, j*pcheight + offset))
+                            screen.blit(text, (i*board.pcwidth+ offset, j*board.pcheight + offset))
                             count += 1
                         i += 1
                     j += 1

@@ -21,6 +21,7 @@ class Piece:
 
         image =  self.white_piece if is_white else self.black_piece
 
+        #loads 16 images, 1 per piece. TODO: Load one image used by every piece
         self.piece_image = pygame.image.load(image)
         self.piece_image = pygame.transform.scale(self.piece_image, size)
 
