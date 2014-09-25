@@ -19,7 +19,6 @@ class Piece:
         self.height = height
         size = width, height
 
-        #loads 16 images, 1 per piece. TODO: Load one image used by every piece
         self.piece_image = image
         self.piece_image = pygame.transform.scale(self.piece_image, size)
 
