@@ -8,7 +8,7 @@ class Piece:
     white_piece = img_folder+"white_piece.png"
     #screen
 
-    def __init__(self, screen, is_white, pos, width, height):
+    def __init__(self, screen, is_white, pos, width, height, image):
         """Instantiates a piece object with given properties"""
 
         self.screen = screen
@@ -19,9 +19,7 @@ class Piece:
         self.height = height
         size = width, height
 
-        image =  self.white_piece if is_white else self.black_piece
-
-        self.piece_image = pygame.image.load(image)
+        self.piece_image = image
         self.piece_image = pygame.transform.scale(self.piece_image, size)
 
     def make_king(self):

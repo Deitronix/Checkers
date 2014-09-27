@@ -68,6 +68,10 @@ class Board:
         self.boardimg = pygame.transform.scale(self.boardimg, (width,height))
         self.boardrect = self.boardimg.get_rect()
         self.star = pygame.image.load(self.img_folder + "star.png")
+        self.black_pieceimg = pygame.image.load(self.img_folder+"black_piece.png")
+        self.white_pieceimg = pygame.image.load(self.img_folder+"white_piece.png")
+        self.pcwidth = self.width//8
+        self.pcheight = self.height//8
 
         # initializing black pieces
         x = 0
@@ -78,8 +82,7 @@ class Board:
             while x < 8:
 
                 if x % 2 != y % 2:
-                    print("(" + str(x) + " " + str(y) + ")")
-                    piece = Piece(screen=self.screen, is_white=False, pos=(x,y), width=self.width//8, height=self.height//8)
+                    piece = Piece(screen=self.screen, is_white=False, pos=(x,y), width=self.pcwidth, height=self.pcheight, image=self.black_pieceimg)
                     self.locations[(x, y)] = piece
                     self.black_pieces.append(piece)
                 x += 1
@@ -92,8 +95,7 @@ class Board:
             x = 0
             while x < 8:
                 if x % 2 != y % 2:
-                    print("(" + str(x) + " " + str(y) + ")")
-                    piece = Piece(screen = self.screen, is_white=True, pos=(x,y), width=self.width//8, height=self.height//8)
+                    piece = Piece(screen = self.screen, is_white=True, pos=(x,y), width=self.pcwidth, height=self.pcheight, image=self.white_pieceimg)
                     self.locations[(x, y)] = piece
                     self.white_pieces.append(piece)
                 x += 1
