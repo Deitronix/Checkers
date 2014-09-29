@@ -2,6 +2,7 @@ __author__ = 'Kokouvi Djogbessi'
 
 import sys, pygame, threading
 from board import Board
+from multiprocessing import Process
 
 class Gui():
     """Thread responsible for all gui updates, including inputs - keyboard and move -"""
@@ -46,9 +47,10 @@ class Gui():
 
         self.inmenu = True # displays the menu if True
         self.pcolor = 0
-        # Get turn
+
         self.is_cpu_turn = True
         self.player_is_white = False
+        self.computer_is_ready = False
 
         self.show_numbers = False
         self.piece_is_selected = False
@@ -73,131 +75,139 @@ class Gui():
         text_offset = 0
         ratio_speed = 700
         direction = 1
-        while turn == 0:
-            # TODO: GET TURN
-            for event in pygame.event.get():
-                if pygame.key.get_mods() & pygame.KMOD_ALT:
-                    self.show_numbers = True
-                else:
-                    self.show_numbers = False
-                if event.type == pygame.QUIT: sys.exit()
-                if event.type == pygame.MOUSEBUTTONUP:
-                    if self.inmenu:
-                        pos = pygame.mouse.get_pos()
-                        if pos[0]>self.bheight/2 - 10:
-                            # HUMAN IS WHITE
-                            self.player_is_white = True
-                            self.is_cpu_turn = True
-                        elif  pos[0]<self.bheight/2 + 10 :
-                            # HUMAN IS BLACK
-                            self.player_is_white = False
-                            self.is_cpu_turn = False
-                        self.inmenu = False
+        while 1:
+            while turn == 0:
+                # TODO: GET TURN
+                for event in pygame.event.get():
+                    if pygame.key.get_mods() & pygame.KMOD_ALT:
+                        self.show_numbers = True
                     else:
-                        pos = pygame.mouse.get_pos()
-                        if self.board.collidepoint(pos):
-                            clicked_piece = []
-                            if self.player_is_white:
-                                clicked_piece = [p for p in self.white_pieces if self.collide(p.pos, pos)]
-                            else:
-                                clicked_piece = [p for p in self.black_pieces if self.collide(p.pos, pos)]
-                            if self.piece_is_selected:
-                                if not len(clicked_piece)<0:
-                                    self.selected_number = 0
-                                    self.piece_is_selected = False
+                        self.show_numbers = False
+                    if event.type == pygame.QUIT: sys.exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if self.inmenu:
+                            pos = pygame.mouse.get_pos()
+                            if pos[1] < self.bheight/2:
+                                # HUMAN IS WHITE
+                                turn = 1
+                                self.player_is_white = True
+                                self.is_cpu_turn = True
+                            elif pos[1] > self.bheight/2:
+                                # HUMAN IS BLACK
+                                self.player_is_white = False
+                                self.is_cpu_turn = False
+                            self.inmenu = False
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        if not self.inmenu:
+                            pos = pygame.mouse.get_pos()
+                            if self.board.collidepoint(pos):
+                                clicked_piece = []
+                                if self.player_is_white:
+                                    clicked_piece = [p for p in self.white_pieces if self.collide(p.pos, pos)]
                                 else:
-                                    new_selection = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
-                                    if new_selection == self.selected_number:
-                                        pass
+                                    clicked_piece = [p for p in self.black_pieces if self.collide(p.pos, pos)]
+                                if self.piece_is_selected:
+                                    if not len(clicked_piece)<0:
+                                        self.selected_number = 0
+                                        self.piece_is_selected = False
                                     else:
-                                        self.selected_number = new_selection
-                            elif len(clicked_piece):
-                                self.selected_number = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
-                                self.typing_text += str(self.selected_number) + " "
-                                self.piece_is_selected = True
-                                #TODO Finish selection process
+                                        new_selection = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
+                                        if new_selection == self.selected_number:
+                                            pass
+                                        else:
+                                            self.selected_number = new_selection
+                                elif len(clicked_piece):
+                                    self.selected_number = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
+                                    self.typing_text += str(self.selected_number) + " "
+                                    self.piece_is_selected = True
+                                    #TODO Finish selection process
 
-                if event.type == pygame.KEYDOWN:
-                    # if not self.is_cpu_turn:
-                    char = event.unicode
-                    self.typing_text += char
-                    if pygame.key.get_pressed()[pygame.K_RETURN]:
-                        self.typing_text = self.typing_text[:-1]
-                        if self.typing_text.lower() == "exit" or self.typing_text.lower() == "quit":
-                            sys.exit(0)
-                        elif self.typing_text == "undo" or self.typing_text == "u":
-                            pass
-                        else:
-                            self.display(self.typing_text)
-                            try:
-                                move_coords = self.typing_text.split(" ")
-                                coord1 = int(move_coords[0])# move([0],[1])
-                                coord2 = int(move_coords[1])
-                                self.board.move_human(coord1, coord2)
-                            except Exception as exp:
-                                self.display("Invalid command - %s" %str(exp))
-                                print (exp)
-                            self.typing_text = ""
-                            #innerLogic.humanMove(move_coords)
-                    if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
-                        self.typing_text = self.typing_text[:-1]
-                        self.typing_text = self.typing_text[:-1]
+                    if event.type == pygame.KEYDOWN:
+                        # if not self.is_cpu_turn:
+                        char = event.unicode
+                        self.typing_text += char
+                        if pygame.key.get_pressed()[pygame.K_RETURN]:
+                            self.typing_text = self.typing_text[:-1]
+                            if self.typing_text.lower() == "exit" or self.typing_text.lower() == "quit":
+                                sys.exit(0)
+                            elif self.typing_text == "undo" or self.typing_text == "u":
+                                pass
+                            else:
+                                self.display(self.typing_text)
+                                try:
+                                    move_coords = self.typing_text.split(" ")
+                                    coord1 = int(move_coords[0])# move([0],[1])
+                                    coord2 = int(move_coords[1])
+                                    self.board.move_human(coord1, coord2)
+                                    turn = 1
+                                    self.is_cpu_turn = True
+                                except Exception as exp:
+                                    self.display("Invalid command - %s" %str(exp))
+                                    print (exp)
+                                self.typing_text = ""
+                                #innerLogic.humanMove(move_coords)
+                        if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
+                            self.typing_text = self.typing_text[:-1]
+                            self.typing_text = self.typing_text[:-1]
 
 
-            self.board.draw(self.inmenu)
-            fnt = pygame.font.SysFont("Calibri", self.font_size)
-            hintfnt = pygame.font.SysFont("monotype", self.font_size)
-            if self.inmenu:
-                self.screen.blit(self.menu, self.menurect)
-            else:
-                self.screen.blit(self.console, (self.bwidth, 0))
-                self.screen.blit(self.cpu_play, (self.bwidth, 0))
-                # --- CONSOLE TEXT ---
-                if self.show_numbers:
-                    count = 1
-                    j = 0
-                    offset = 5
-                    while j < 8:
-                        i = 0
-                        while i < 8:
-                            if i % 2 != j % 2:
-                                text = hintfnt.render(str(count), 1, (255, 20 , 20))
-                                self.screen.blit(text, (i*self.board.pcwidth+ offset, j*self.board.pcheight + offset))
-                                count += 1
-                            i += 1
-                        j += 1
-
-                #TODO - Wrap lines
-                # - Input display
-                text = fnt.render(">> "+self.typing_text+"_", 1, (0, 0, 0))
-                self.screen.blit(text, (self.bwidth, (self.max_display-1)*self.theight + self.pheight))
-                if self.is_cpu_turn:
-                    self.screen.blit(self.cpu_play, (self.bwidth, 0))
+                self.board.draw(self.inmenu)
+                fnt = pygame.font.SysFont("Calibri", self.font_size)
+                hintfnt = pygame.font.SysFont("monotype", self.font_size)
+                if self.inmenu:
+                    self.screen.blit(self.menu, self.menurect)
                 else:
-                    self.screen.blit(self.h_play, (self.bwidth, 0))
+                    self.screen.blit(self.console, (self.bwidth, 0))
+                    self.screen.blit(self.cpu_play, (self.bwidth, 0))
+                    # --- CONSOLE TEXT ---
+                    if self.show_numbers:
+                        count = 1
+                        j = 0
+                        offset = 5
+                        while j < 8:
+                            i = 0
+                            while i < 8:
+                                if i % 2 != j % 2:
+                                    text = hintfnt.render(str(count), 1, (255, 20 , 20))
+                                    self.screen.blit(text, (i*self.board.pcwidth+ offset, j*self.board.pcheight + offset))
+                                    count += 1
+                                i += 1
+                            j += 1
 
-                    #-- Console display
-                i = 0
-                text_offset += direction
-                if text_offset<0 or text_offset>2*ratio_speed/3:
-                    direction *= -1
+                    #TODO - Wrap lines
+                    # - Input display
+                    text = fnt.render(">> "+self.typing_text+"_", 1, (0, 0, 0))
+                    self.screen.blit(text, (self.bwidth, (self.max_display-1)*self.theight + self.pheight))
+                    if self.is_cpu_turn:
+                        self.screen.blit(self.cpu_play, (self.bwidth, 0))
+                    else:
+                        self.screen.blit(self.h_play, (self.bwidth, 0))
 
-                while i < self.max_display - 1 and i < len(self.text_display):
-                    text = fnt.render("> " + self.text_display[i], 1, (0, 0, 0))
-                    speed = 0
-                    if text.get_width() > self.pwidth: # if text is too big
-                        speed = text.get_width()/ratio_speed # get its speed ratio
-                    self.screen.blit(text, (self.bwidth, i*self.theight + self.pheight),
-                                     (speed*text_offset, 0, self.twidth, self.theight))
-                    i += 1
-            pygame.display.flip()
-        else:
-            # If i get correctly my gui will freeze for a single tic to launch the computer move :)
-            # ill launch the concurrent process here, and return to the main loop
-            self.board.computerMove()
-            # Ok here - I will give a parameter (computer_is_playing)
-            # that i will check while running the main gui loop.
-            # After the computer plays just reaffect that to tru, and i will allow the human play
+                        #-- Console display
+                    i = 0
+                    text_offset += direction
+                    if text_offset<0 or text_offset>2*ratio_speed/3:
+                        direction *= -1
+
+                    while i < self.max_display - 1 and i < len(self.text_display):
+                        text = fnt.render("> " + self.text_display[i], 1, (0, 0, 0))
+                        speed = 0
+                        if text.get_width() > self.pwidth: # if text is too big
+                            speed = text.get_width()/ratio_speed # get its speed ratio
+                        self.screen.blit(text, (self.bwidth, i*self.theight + self.pheight),
+                                         (speed*text_offset, 0, self.twidth, self.theight))
+                        i += 1
+                pygame.display.flip()
+            else:
+                # I don't think I need to create another thread.. it goes fast...
+                
+                """
+                p = Process(target=self.board.computerMove, args=(self,))
+                p.start()
+                p.join()
+                self.computer_is_ready = False
+                # """
+                self.board.computerMove()
 
             turn = 0
 if __name__ == '__main__':
