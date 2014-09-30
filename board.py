@@ -1,4 +1,7 @@
-__author__ = 'Hannah Saloiye'
+'''
+Board.py - this file creates a representation of a game board and embodies all the game logic including
+human and computer moving, jump pieces, kinging piece, and win conditions.
+'''
 
 from piece import Piece
 import pygame
@@ -163,16 +166,15 @@ class Board:
         if fromPiece and not toPiece:
             if fromPiece.is_white:
                 if (toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x -1) and toCoord.y == fromCoord.y-1:
-                    print(fromPiece.is_king)
-                    self.single_move(toCoord, fromCoord, fromPiece)
+                        self.single_move(toCoord, fromCoord, fromPiece)
                 elif (fromPiece.is_king) and ((toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x -1) and toCoord.y == fromCoord.y+1):
-                    print(fromPiece.is_king)
                     self.single_move(toCoord, fromCoord, fromPiece)
                 elif (toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:
                     if toCoord.x == fromCoord.x+2:
                         direction = "right"
                     else:
                         direction = "left"
+                        #first jump
                     self.jump_move(toCoord, fromCoord, fromPiece, direction)
                 elif (fromPiece.is_king) and ((toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x -2) and toCoord.y == fromCoord.y+2):
                     if toCoord.x == fromCoord.x+2:
@@ -185,7 +187,7 @@ class Board:
             if not fromPiece.is_white:
                 #print(fromPiece.is_king)
                 if (toCoord.x == fromCoord.x + 1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y+1:
-                    self.single_move(toCoord, fromCoord, fromPiece)
+                     self.single_move(toCoord, fromCoord, fromPiece)
                 elif (fromPiece.is_king) and ((toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y-1):
                     self.single_move(toCoord, fromCoord, fromPiece)
                 elif (toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2:
@@ -203,14 +205,14 @@ class Board:
                 else:
                     raise Exception ("Invalid human move")
         else:
-            raise Exception ("Invalid human move!")
+            raise Exception("Invalid human move!")
 
     def collidepoint(self, pos):
         return self.boardrect.collidepoint(pos)
 
 
-    def computerMove(self):
-        possible_moves = self.find_next_states()
+    def computerMove(self, color):
+        possible_moves = self.find_next_states(color)
     # Choose a move somehow... for now you can probably do:
         if possible_moves:
             next_move = possible_moves[ 0 ]
@@ -219,34 +221,43 @@ class Board:
                 self.anotherJump = False
                 return
             if self.jumpFlag == 1:
-                self.make_move_computer(next_move)
+                self.make_move_computer(next_move, color)
                 self.jumpFlag = 0
                 self.anotherJump = True
-                self.computerMove()
+                self.computerMove(color)
             else:
-                self.make_move_computer(next_move)
+                self.make_move_computer(next_move, color)
         else:
             raise Exception ("No valid moves exist for computer.")
 
 
-    def find_next_states(self):
+    def find_next_states(self, color):
         next_states = []
-        for piece in self.black_pieces:
-            valid_moves = self.find_valid_moves(piece)
-            (move, jump) = valid_moves
+        if color == "black":
+            for piece in self.black_pieces:
+                valid_moves = self.find_valid_moves(piece, color)
+                (move, jump) = valid_moves
+                if jump:
+                    next_states = jump + next_states
+                else:
+                    if not self.jumpFlag == 1:
+                        next_states += move
+        else:
+            for piece in self.white_pieces:
+                valid_moves = self.find_valid_moves(piece, color)
+                (move, jump) = valid_moves
             #add next states to list instead of making a list of lists with append
-            if jump:
-               next_states = jump + next_states
-
-            else:
-                if not self.jumpFlag == 1:
-                    next_states += move
+                if jump:
+                    next_states = jump + next_states
+                else:
+                    if not self.jumpFlag == 1:
+                        next_states += move
 #        for valid_move in valid_moves:
 #            next_states.append( self.copy_board(valid_move))
 
         return next_states
 
-    def find_valid_moves(self, piece):
+    def find_valid_moves(self, piece, color):
         valid_moves = []
         valid_jump_moves = []
         (coordX, coordY) = piece._get_pos()
@@ -262,10 +273,15 @@ class Board:
 #       jump move
         if not self.is_valid_move(fromSquare, moveToLeft):
             direction = "left"
-            if self.computer_jump(fromSquare, moveToLeft, direction):
-                newMoveLeft = (coordX - 2, coordY + 2)
-                valid_jump_moves.append((fromSquare, newMoveLeft))
-                self.right = 1
+            if self.computer_jump(fromSquare, moveToLeft, direction, color):
+                if color == "black":
+                    newMoveLeft = (coordX - 2, coordY + 2)
+                    valid_jump_moves.append((fromSquare, newMoveLeft))
+                    self.right = 1
+                else:
+                    newMoveLeft = (coordX - 2, coordY - 2)
+                    valid_jump_moves.append((fromSquare, newMoveLeft))
+                    self.right = 1
         #       single move
         else:
             if not self.jumpFlag == 1:
@@ -273,10 +289,15 @@ class Board:
 
         if not self.is_valid_move(fromSquare, moveToRight):
             direction = "right"
-            if self.computer_jump(fromSquare, moveToRight, direction):
-                newMoveRight = (coordX + 2, coordY + 2)
-                valid_jump_moves.append((fromSquare, newMoveRight))
-                self.right = 0
+            if self.computer_jump(fromSquare, moveToRight, direction, color):
+                if color == "black":
+                    newMoveRight = (coordX + 2, coordY + 2)
+                    valid_jump_moves.append((fromSquare, newMoveRight))
+                    self.right = 0
+                else:
+                    newMoveLeft = (coordX - 2, coordY - 2)
+                    valid_jump_moves.append((fromSquare, newMoveLeft))
+                    self.right = 0
         else:
             if not self.jumpFlag == 1:
                 valid_moves.append((fromSquare, moveToRight))
@@ -292,40 +313,56 @@ class Board:
         return not toPiece and 0 <= toCoordX <= 7 and 0 <= toCoordY <= 7
 
 
-    def make_move_computer(self, next_move):
+    def make_move_computer(self, next_move, color):
         (fromCoord, toCoord) = next_move
         fromPiece = self.locations[fromCoord]
         self.locations[toCoord] = fromPiece
         (CoordX, CoordY) = fromCoord
 
-        #jump left and update board
-        if self.jumpFlag == 1 and self.right == 1:
-                jumpedPiece = self.locations[(CoordX-1, CoordY+1)]
-                self.white_pieces.remove(jumpedPiece)
-                del self.locations[CoordX-1, CoordY+1]
-        #jump right and update board
-        elif self.jumpFlag == 1 and self.right == 0:
-                jumpedPiece = self.locations[(CoordX+1, CoordY+1)]
-                self.white_pieces.remove(jumpedPiece)
-                del self.locations[CoordX+1, CoordY+1]
+        #check to see what color is being played and what needs to be removed
+        if color == "black":
+            #jump left and update board
+            if self.jumpFlag == 1 and self.right == 1:
+                    jumpedPiece = self.locations[(CoordX-1, CoordY+1)]
+                    self.white_pieces.remove(jumpedPiece)
+                    del self.locations[CoordX-1, CoordY+1]
+            #jump right and update board
+            elif self.jumpFlag == 1 and self.right == 0:
+                    jumpedPiece = self.locations[(CoordX+1, CoordY+1)]
+                    self.white_pieces.remove(jumpedPiece)
+                    del self.locations[CoordX+1, CoordY+1]
+        else:
+            #jump left and update board
+            if self.jumpFlag == 1 and self.right == 1:
+                    jumpedPiece = self.locations[(CoordX-1, CoordY-1)]
+                    self.black_pieces.remove(jumpedPiece)
+                    del self.locations[CoordX-1, CoordY+1]
+            #jump right and update board
+            elif self.jumpFlag == 1 and self.right == 0:
+                    jumpedPiece = self.locations[(CoordX+1, CoordY-1)]
+                    self.black_pieces.remove(jumpedPiece)
+                    del self.locations[CoordX+1, CoordY+1]
 
         del self.locations[fromCoord]
         fromPiece._set_pos(toCoord)
 
-    def computer_jump(self, fromSquare, toSquare, direction):
+    def computer_jump(self, fromSquare, toSquare, direction, color):
 
         #toPiece and fromPiece are piece objects
         fromPiece = self.locations.get(fromSquare, None)
         toPiece = self.locations.get(toSquare, None)
-
         (toCoordX, toCoordY) = toSquare
         toCoord = (toCoordX, toCoordY)
 
-        doubleLeft = (toCoordX - 1, toCoordY + 1)
-        doubleRight = (toCoordX + 1, toCoordY + 1)
+        if color == "white":
+            doubleLeft = (toCoordX - 1, toCoordY - 1)
+            doubleRight = (toCoordX + 1, toCoordY - 1)
+        else:
+            doubleLeft = (toCoordX -1, toCoordY + 1)
+            doubleRight = (toCoordX + 1, toCoordY + 1)
 
         if toPiece and Piece.get_color(toPiece) == Piece.get_color(fromPiece):
-           return
+            return
         elif not (0,0) <= toCoord <= (7,7) and ((0,0)<=doubleLeft<=(7,7) or (0,0)<=doubleRight<=(7,7)):
             return
         else:

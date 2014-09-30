@@ -138,14 +138,17 @@ class Gui():
                                     move_coords = self.typing_text.split(" ")
                                     coord1 = int(move_coords[0])# move([0],[1])
                                     coord2 = int(move_coords[1])
+
                                     self.board.move_human(coord1, coord2)
+                                    '''coords = eval(self.typing_text)
+                                    if type(coords) is tuple and all(type(n) is int for n in coords):
+                                        self.board.move_human(*coords)'''
                                     turn = 1
                                     self.is_cpu_turn = True
                                 except Exception as exp:
                                     self.display("Invalid command - %s" %str(exp))
                                     print (exp)
                                 self.typing_text = ""
-                                #innerLogic.humanMove(move_coords)
                         if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
                             self.typing_text = self.typing_text[:-1]
                             self.typing_text = self.typing_text[:-1]
@@ -207,7 +210,10 @@ class Gui():
                 p.join()
                 self.computer_is_ready = False
                 # """
-                self.board.computerMove()
+                if self.player_is_white:
+                    self.board.computerMove("black")
+                else:
+                    self.board.computerMove("white")
 
             turn = 0
 if __name__ == '__main__':

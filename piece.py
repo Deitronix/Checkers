@@ -50,4 +50,4 @@ class Piece:
         if self.is_white:
             return "white"
         else:
-            return "black:"
+            return "black"
