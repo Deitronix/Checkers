@@ -214,7 +214,7 @@ class Board:
                             self.single_move(toCoord, fromCoord, fromPiece)
                         elif(toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x -2) and toCoord.y == fromCoord.y+2:
                             if toCoord.x == fromCoord.x+2:
-                                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]#white backward left
+                                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]#white backward right
                                 if jumpedPiece.is_white:
                                     raise Exception("Sorry, that is not a valid move")
                             else:
@@ -229,19 +229,27 @@ class Board:
                         self.single_move(toCoord, fromCoord, fromPiece)
                     elif (toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2:
                         if toCoord.x == fromCoord.x+2:
-                            direction = "right"
+                            jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]#black forward right
+                            if not jumpedPiece.is_white:
+                                raise Exception("Sorry, that is not a valid move")
                         else:
-                            direction = "left"
-                        self.jump_move(toCoord, fromCoord, fromPiece, direction)
+                            jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y+1]#black backward left
+                            if not jumpedPiece.is_white:
+                                raise Exception("Sorry, that is not a valid move")
+                        self.jump_move(toCoord, fromCoord, fromPiece)
                     elif(fromPiece.is_king):
                         if(toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y-1:
                             self.single_move(toCoord, fromCoord, fromPiece)
                         elif (toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:
                             if toCoord.x == fromCoord.x+2:
-                                direction = "right"
+                                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y-1]#black backward right
+                                if not jumpedPiece.is_white:
+                                    raise Exception("Sorry, that is not a valid move")
                             else:
-                                direction = "left"
-                        self.jump_move(toCoord, fromCoord, fromPiece, direction)
+                                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y-1]#white backward left
+                                if jumpedPiece.is_white:
+                                    raise Exception("Sorry, that is not a valid move")
+                        self.jump_move(toCoord, fromCoord, fromPiece)
 
                     else:
                         raise Exception("Invalid human move")
@@ -256,7 +264,7 @@ class Board:
         possible_moves = self.find_next_states()
     # Choose a move somehow... for now you can probably do:
         if possible_moves:
-            next_move = possible_moves[ 0 ]
+            next_move = possible_moves[0]
             #check to see if anotherJump has already occurred and if there isn't a new jump to be made
             if self.anotherJump and self.jumpFlag == 0:
                 self.anotherJump = False
