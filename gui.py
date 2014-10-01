@@ -2,7 +2,7 @@ __author__ = 'Kokouvi Djogbessi'
 
 import sys, pygame, threading
 from board import Board
-from multiprocessing import Process
+#from multiprocessing import Process
 
 class Gui():
     """Thread responsible for all gui updates, including inputs - keyboard and move -"""
@@ -138,7 +138,7 @@ class Gui():
                                     move_coords = self.typing_text.split(" ")
                                     coord1 = int(move_coords[0])# move([0],[1])
                                     coord2 = int(move_coords[1])
-                                    self.board.move_human(coord1, coord2)
+                                    self.board.move_human(coord1, coord2, self.player_is_white)
                                     turn = 1
                                     self.is_cpu_turn = True
                                 except Exception as exp:
@@ -208,6 +208,8 @@ class Gui():
                 self.computer_is_ready = False
                 # """
                 self.board.computerMove()
+
+
 
             turn = 0
 if __name__ == '__main__':
