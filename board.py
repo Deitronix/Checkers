@@ -352,7 +352,6 @@ class Board:
 
 
         #check to see what color is being played and what needs to be removed
-
         if fromPiece.is_white:
             #jump right forward and update board
             if self.jumpFlag == 1 and (fromCoordX < toCoordX) and (fromCoordY > toCoordY):
@@ -379,7 +378,6 @@ class Board:
                 jumpedPiece = self.locations[(fromCoordX+1, fromCoordY+1)]
                 self.white_pieces.remove(jumpedPiece)
                 del self.locations[fromCoordX+1, fromCoordY+1]
-
         del self.locations[fromCoord]
         fromPiece._set_pos(toCoord)
 
