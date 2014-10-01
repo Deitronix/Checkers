@@ -115,10 +115,6 @@ class Board:
 
 
 
-
-    def validateStart(self, boardLocation):
-        print("in validate Start")
-
     def single_move(self, toCoord, fromCoord, fromPiece):
         self.locations[(toCoord.x, toCoord.y)] = fromPiece
         del self.locations[(fromCoord.x, fromCoord.y)]
@@ -130,8 +126,6 @@ class Board:
         self.locations[(toCoord.x, toCoord.y)] = fromPiece
         del self.locations[(fromCoord.x, fromCoord.y)]
         fromPiece._set_pos((toCoord.x, toCoord.y))
-        print("from piece.pos is: ")
-        print(fromPiece.pos)
 
         if fromPiece.is_white:
             if(toCoord.x > fromCoord.x) and toCoord.y<fromCoord.y:#forward, right
@@ -176,7 +170,7 @@ class Board:
 
 
     def validate_input(self, fromPiece, player_is_white):
-        print ("in validate method")
+
         if player_is_white and (not fromPiece.is_white):
             return False
         elif (not player_is_white) and fromPiece.is_white:
@@ -255,6 +249,45 @@ class Board:
                         raise Exception("Invalid human move")
             else:
                 raise Exception("Invalid human move!")
+    def is_jump(self, fromPiece, coord_a, coord_b, player_is_white):
+        fromCoord = self.numberToTupleKey[coord_a]
+        toCoord = self.numberToTupleKey[coord_b]
+
+        #in the case that a piece becomes a king in the middle of a double jump, it check needs to know to consider the piece a king
+        if player_is_white and toCoord.y ==0:
+            fromPiece.make_king()
+        elif not player_is_white and toCoord.y == 7:
+            fromPiece.make_king()
+
+        if player_is_white:
+            if(toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:#forward, right or forward left
+                return True
+            elif fromPiece.is_king and ((toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2):#backward right, left for kings
+                return True
+            else:
+                return False
+        elif not player_is_white:
+            if(toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2:#forward right or left
+                return True
+            elif fromPiece.is_king and ((toCoord.x == fromCoord.x + 2 or toCoord.x ==fromCoord.x - 2) and toCoord.y == fromCoord.y-2):#backwards right, left
+                return True
+            else:
+                return False
+        else:
+            return False
+
+
+    def human_double(self, coord1, coord2, coord3, player_is_white):
+
+        fromCoord = self.numberToTupleKey[coord1]
+        fromPiece = self.locations.get(fromCoord, None)
+
+        if self.is_jump(fromPiece, coord1, coord2, player_is_white) and self.is_jump(fromPiece, coord2, coord3, player_is_white):
+                self.move_human(coord1,coord2, player_is_white)
+                self.move_human(coord2, coord3, player_is_white)
+        else:
+            raise Exception ("Invalid double move")
+
 
     def collidepoint(self, pos):
         return self.boardrect.collidepoint(pos)

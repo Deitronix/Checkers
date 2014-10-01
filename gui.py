@@ -138,7 +138,11 @@ class Gui():
                                     move_coords = self.typing_text.split(" ")
                                     coord1 = int(move_coords[0])# move([0],[1])
                                     coord2 = int(move_coords[1])
-                                    self.board.move_human(coord1, coord2, self.player_is_white)
+                                    if len(move_coords)== 3:
+                                        coord3 = int(move_coords[2])
+                                        self.board.human_double(coord1, coord2, coord3, self.player_is_white)
+                                    else:
+                                        self.board.move_human(coord1, coord2, self.player_is_white)
                                     turn = 1
                                     self.is_cpu_turn = True
                                 except Exception as exp:
