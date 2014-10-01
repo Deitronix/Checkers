@@ -1,4 +1,5 @@
-__author__ = 'Kokouvi Djogbessi'
+''' piece.py - this class holds attributes of the Piece object. '''
+
 import pygame
 class Piece:
     """Contains information about a checkers piece. A piece is a pawn at creation,
@@ -41,9 +42,9 @@ class Piece:
     def __repr__(self):
         """Displays the position and type of the piece"""
         if self.is_white:
-            color = "White"
+            color = "white"
         else:
-            color = "Black"
+            color = "black"
         return "{} at {}".format(color, self.pos)
 
     def get_color(self):

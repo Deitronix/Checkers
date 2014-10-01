@@ -1,4 +1,7 @@
-__author__ = 'Kokouvi Djogbessi'
+'''gui.py - this file create a graphical user interface that takes in user input and determines what
+color that user is and whether they went first or second. It also indicates to the user whether it is
+their turn or the computers
+'''
 
 import sys, pygame, threading
 from board import Board
