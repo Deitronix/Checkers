@@ -9,7 +9,7 @@ from collections import namedtuple
 
 class Board:
     anotherJump = False #for use with the computer move and jumping
-    right = False #to determine which way the computer is moving right = 0 is right
+    right = 0 #to determine which way the computer is moving right = 0 is right right = 1 is left
     jumpFlag = 0 #to determine if the computer has made a jump
     locations = dict()
     black_pieces = list()
@@ -234,15 +234,17 @@ class Board:
     def collidepoint(self, pos):
         return self.boardrect.collidepoint(pos)
 
-
     def computerMove(self, color):
         possible_moves = self.find_next_states(color)
     # Choose a move somehow... for now you can probably do:
         if possible_moves:
             next_move = possible_moves[ 0 ]
+            self.make_move_computer(next_move)
+
             #check to see if anotherJump has already occurred and if there isn't a new jump to be made
-            if self.anotherJump and self.jumpFlag == 0:
+            '''if self.anotherJump and self.jumpFlag == 0:
                 self.anotherJump = False
+                return
             #check to see if a jump has been made
             elif self.jumpFlag == 1:
                 self.make_move_computer(next_move)
@@ -252,9 +254,10 @@ class Board:
                 self.computerMove(color)
             #should be single move
             elif self.jumpFlag == 0 and not self.anotherJump:
-                self.make_move_computer(next_move)
+                self.make_move_computer(next_move)'''
         else:
             raise Exception ("No valid moves exist for computer.")
+
 
 
     def find_next_states(self, color):
@@ -263,21 +266,14 @@ class Board:
             for piece in self.black_pieces:
                 valid_moves = self.find_valid_moves(piece, color)
                 (move, jump) = valid_moves
-                if jump:
-                    next_states = jump + next_states
-                else:
-                    if not self.jumpFlag == 1:
-                        next_states += move
+                next_states = jump + next_states + move
         else:
             for piece in self.white_pieces:
                 valid_moves = self.find_valid_moves(piece, color)
                 (move, jump) = valid_moves
             #add next states to list instead of making a list of lists with append
-                if jump:
-                    next_states = jump + next_states
-                else:
-                    if not self.jumpFlag == 1:
-                        next_states += move
+                next_states = jump + next_states + move
+
 #        for valid_move in valid_moves:
 #            next_states.append( self.copy_board(valid_move))
 
@@ -296,46 +292,39 @@ class Board:
             moveToLeft = (coordX - 1, coordY - 1)
             moveToRight = (coordX + 1, coordY - 1)
     #   jump move
-        if not self.is_valid_move(fromSquare, moveToLeft):
+        if not self.is_valid_move(fromSquare, moveToLeft, color):
             direction = "left"
             if self.computer_jump(fromSquare, moveToLeft, direction, color):
                 if color == "black":
                     newMoveLeft = (coordX - 2, coordY + 2)
-                    self.right = False
                     valid_jump_moves.append((fromSquare, newMoveLeft))
                 else:
                     newMoveLeft = (coordX - 2, coordY - 2)
-                    self.right = False
                     valid_jump_moves.append((fromSquare, newMoveLeft))
             else:
                 print("i do nothing")
-        else:
-            if self.jumpFlag == 0:
-                valid_moves.append((fromSquare, moveToLeft))
         #single move
-        if not self.is_valid_move(fromSquare, moveToRight):
+        else:
+             valid_moves.append((fromSquare, moveToLeft))
+
+        if not self.is_valid_move(fromSquare, moveToRight, color):
             direction = "right"
             if self.computer_jump(fromSquare, moveToRight, direction, color):
                 if color == "black":
                     newMoveRight = (coordX + 2, coordY + 2)
-                    self.right = True
                     valid_jump_moves.append((fromSquare, newMoveRight))
                 else:
                     newMoveRight = (coordX + 2, coordY - 2)
-                    self.right = True
                     valid_jump_moves.append((fromSquare, newMoveRight))
             else:
-                print ("i do nothing")
+                print("i do nothing")
+        #single move
         else:
-            if self.jumpFlag == 0:
-                valid_moves.append((fromSquare, moveToRight))
-
-        #find some way to set the direction flag without accidently changing it from left to right so
-        #jump can work properly
+             valid_moves.append((fromSquare, moveToRight))
 
         return (valid_moves, valid_jump_moves)
 
-    def is_valid_move(self, fromCoord, toCoord):
+    def is_valid_move(self, fromCoord, toCoord, color):
         fromPiece = self.locations.get(fromCoord, None)
         toPiece = self.locations.get(toCoord, None)
         (toCoordX, toCoordY) = toCoord
@@ -345,26 +334,25 @@ class Board:
 
     def make_move_computer(self, next_move):
         (fromCoord, toCoord) = next_move
+        (fromCoordX, fromCoordY) = fromCoord
+        #fromPiece = self.locations.get((fromCoordX, fromCoordY))
         fromPiece = self.locations[fromCoord]
         self.locations[toCoord] = fromPiece
         (fromCoordX, fromCoordY) = fromCoord
         (toCoordX, toCoordY) = toCoord
 
-
         #check to see what color is being played and what needs to be removed
         if fromPiece.is_white:
             #jump right forward and update board
             if self.jumpFlag == 1 and (fromCoordX < toCoordX) and (fromCoordY > toCoordY):
-                if self.right:
-                    jumpedPiece = self.locations[(fromCoordX+1, fromCoordY-1)]
-                    self.black_pieces.remove(jumpedPiece)
-                    del self.locations[fromCoordX+1, fromCoordY-1]
+                jumpedPiece = self.locations[(fromCoordX+1, fromCoordY-1)]
+                self.black_pieces.remove(jumpedPiece)
+                del self.locations[fromCoordX+1, fromCoordY-1]
             #jump left forward and update board
             elif self.jumpFlag == 1 and (fromCoordX > toCoordX) and (fromCoordY > toCoordY):
-                if not self.right:
-                    jumpedPiece = self.locations[(fromCoordX-1, fromCoordY-1)]
-                    self.black_pieces.remove(jumpedPiece)
-                    del self.locations[fromCoordX-1, fromCoordY-1]
+                jumpedPiece = self.locations[(fromCoordX-1, fromCoordY-1)]
+                self.black_pieces.remove(jumpedPiece)
+                del self.locations[fromCoordX-1, fromCoordY-1]
         else:
             #jump left forward and update board
             if self.jumpFlag == 1 and ((fromCoordX > toCoordX) and (fromCoordY < toCoordY)):
@@ -378,11 +366,61 @@ class Board:
                 jumpedPiece = self.locations[(fromCoordX+1, fromCoordY+1)]
                 self.white_pieces.remove(jumpedPiece)
                 del self.locations[fromCoordX+1, fromCoordY+1]
-        del self.locations[fromCoord]
-        fromPiece._set_pos(toCoord)
+        #will allow to update for single moves
+        if self.jumpFlag == 1:
+            self.jumpFlag = 0
+            del self.locations[fromCoord]
+            fromPiece._set_pos(toCoord)
+            next_moves = self.multiple_jump(toCoord, fromPiece)
+            if next_moves is not None:
+                self.make_move_computer(next_moves)
+        else:
+            del self.locations[fromCoord]
+            fromPiece._set_pos(toCoord)
+
+    def multiple_jump(self, fromCoord, fromPiece):
+        (fromCoordX, fromCoordY) = fromCoord
+        new_moves = ((None, None), (None, None))
+
+        if fromPiece.is_white:
+            moveLeft = (fromCoordX -1, fromCoordY -1)
+            moveRight = (fromCoordX +1, fromCoordY -1)
+            color = "white"
+        else:
+            moveLeft = (fromCoordX -1, fromCoordY+1)
+            moveRight = (fromCoordX + 1, fromCoordY + 1)
+            color = "black"
+        if not self.is_valid_move(fromCoord, moveLeft, color):
+            direction = "left"
+            if self.computer_jump(fromCoord, moveLeft, direction, color):
+                if color == "black":
+                    newMoveLeft = (fromCoordX - 2, fromCoordY + 2)
+                    new_moves = (fromCoord, newMoveLeft)
+                    return new_moves
+                else:
+                    newMoveLeft = (fromCoordX - 2, fromCoordY - 2)
+                    new_moves = (fromCoord, newMoveLeft)
+                    return new_moves
+            else:
+                return
+        elif not self.is_valid_move(fromCoord, moveRight, color):
+            direction = "right"
+            if self.computer_jump(fromCoord, moveRight, direction, color):
+                if color == "black":
+                    newMoveRight = (fromCoordX + 2, fromCoordY - 2)
+                    new_moves = (fromCoord, newMoveRight)
+                    return new_moves
+                else:
+                    newMoveLeft = (fromCoordX + 2, fromCoordY + 2)
+                    new_moves = (fromCoord, newMoveLeft)
+                    return new_moves
+        else:
+            return new_moves
+
+        #fromPiece.is_king
+
 
     def computer_jump(self, fromSquare, toSquare, direction, color):
-
         #toPiece and fromPiece are piece objects
         fromPiece = self.locations.get(fromSquare, None)
         toPiece = self.locations.get(toSquare, None)
@@ -396,21 +434,40 @@ class Board:
             doubleLeft = (toCoordX -1, toCoordY + 1)
             doubleRight = (toCoordX + 1, toCoordY + 1)
 
-        if (fromPiece and not toPiece) and self.jumpFlag == 1:
+        if fromPiece and not toPiece:
             return False
         elif not 0 <= toCoordX <= 7 and not 0<= toCoordY <=7:
             return False
         elif fromPiece and toPiece:
             if fromPiece.get_color() is not toPiece.get_color():
                 if direction == "left":
-                    newToPiece = self.is_valid_move(fromPiece, doubleLeft)
+                    newToPiece = self.is_valid_move(fromPiece, doubleLeft, color)
                 elif direction == "right":
-                    newToPiece = self.is_valid_move(fromPiece, doubleRight)
+                    newToPiece = self.is_valid_move(fromPiece, doubleRight, color)
 
                 if newToPiece:
                     self.jumpFlag = 1
                     return True
                 return False
+
+    def adjacent_sqaures(self, piece, color):
+        (coordX, coordY) = piece._get_pos()
+        fromPiece = (coordX, coordY)
+        possible_moves = []
+        possible_king_moves = []
+
+        if color == "black":
+            right_neighbor = (coordX+1, coordY +1)
+            left_neighbor = (coordX-1, coordY +1)
+
+            if self.check_king(fromPiece, coordY+1):
+                print("Something")
+                return possible_king_moves
+        else:
+            right_neighbor = (coordX+1, coordY -1)
+            left_neighbor = (coordX -1, coordY-1)
+
+        return possible_moves, possible_king_moves
 
     def check_king(self, fromPiece, CoordY):
 
@@ -426,3 +483,5 @@ class Board:
                 fromPiece.make_king()
             else:
                 return
+
+
