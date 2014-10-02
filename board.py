@@ -301,9 +301,9 @@ class Board:
         if possible_moves:
             next_move = possible_moves[ 0 ]
             self.make_move_computer(next_move)
-
         else:
             raise Exception ("No valid moves exist for computer.")
+
 
     def find_next_states(self, color):
         next_states = []
@@ -470,9 +470,7 @@ class Board:
         else:
 
             return new_moves
-
         #fromPiece.is_king
-
 
     def computer_jump(self, fromSquare, toSquare, direction, color):
         #toPiece and fromPiece are piece objects
@@ -523,7 +521,6 @@ class Board:
 
         return possible_moves, possible_king_moves
 
-
     def check_king(self, fromPiece, CoordY):
 
         if fromPiece.is_white:
@@ -538,3 +535,4 @@ class Board:
                 fromPiece.make_king()
             else:
                 return
+            

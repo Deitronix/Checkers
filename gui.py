@@ -221,11 +221,6 @@ class Gui():
                     self.board.computerMove("black")
                 else:
                     self.board.computerMove("white")
-
-
-
-
-
             turn = 0
 if __name__ == '__main__':
     gui = Gui()
