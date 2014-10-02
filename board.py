@@ -256,6 +256,8 @@ class Board:
         toCoord = self.numberToTupleKey[coord_b]
 
         #in the case that a piece becomes a king in the middle of a double jump, it check needs to know to consider the piece a king
+        #this will not work if there is an error.  make a flag to see if it has been made a king. if so, then change it back before the error
+
         if player_is_white and toCoord.y ==0:
             fromPiece.make_king()
         elif not player_is_white and toCoord.y == 7:
@@ -418,12 +420,16 @@ class Board:
                 del self.locations[fromCoordX+1, fromCoordY+1]
         #will allow to update for single moves
         if self.jumpFlag == 1:
-            self.jumpFlag = 0
+            #self.jumpFlag = 0
             del self.locations[fromCoord]
             fromPiece._set_pos(toCoord)
             next_moves = self.multiple_jump(toCoord, fromPiece)
             if next_moves is not None:
+                print('''Next jump: ''')
+                print(next_moves)
                 self.make_move_computer(next_moves)
+            else:
+                self.jumpFlag = 0
         else:
             del self.locations[fromCoord]
             fromPiece._set_pos(toCoord)
@@ -457,11 +463,11 @@ class Board:
             direction = "right"
             if self.computer_jump(fromCoord, moveRight, direction, color):
                 if color == "black":
-                    newMoveRight = (fromCoordX + 2, fromCoordY - 2)
+                    newMoveRight = (fromCoordX + 2, fromCoordY + 2)
                     new_moves = (fromCoord, newMoveRight)
                     return new_moves
                 else:
-                    newMoveLeft = (fromCoordX + 2, fromCoordY + 2)
+                    newMoveLeft = (fromCoordX + 2, fromCoordY - 2)
                     new_moves = (fromCoord, newMoveLeft)
                     return new_moves
         else:
