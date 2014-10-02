@@ -8,6 +8,8 @@ import pygame
 from collections import namedtuple
 
 class Board:
+    anotherJump = False #for use with the computer move and jumping
+    right = 0 #to determine which way the computer is moving right = 0 is right right = 1 is left
     jumpFlag = 0 #to determine if the computer has made a jump
     locations = dict()
     black_pieces = list()
@@ -278,6 +280,7 @@ class Board:
         else:
             return False
 
+
     def human_double(self, coord1, coord2, coord3, player_is_white):
 
         fromCoord = self.numberToTupleKey[coord1]
@@ -298,6 +301,7 @@ class Board:
         if possible_moves:
             next_move = possible_moves[ 0 ]
             self.make_move_computer(next_move)
+
         else:
             raise Exception ("No valid moves exist for computer.")
 
@@ -421,7 +425,7 @@ class Board:
             fromPiece._set_pos(toCoord)
             next_moves = self.multiple_jump(toCoord, fromPiece)
             if next_moves:
-            #is not empty:
+            #is not None:
                 self.make_move_computer(next_moves)
         else:
             del self.locations[fromCoord]
