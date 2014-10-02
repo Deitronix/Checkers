@@ -1,8 +1,11 @@
-__author__ = 'Kokouvi Djogbessi'
+'''gui.py - this file create a graphical user interface that takes in user input and determines what
+color that user is and whether they went first or second. It also indicates to the user whether it is
+their turn or the computers
+'''
 
 import sys, pygame, threading
 from board import Board
-from multiprocessing import Process
+#from multiprocessing import Process
 
 class Gui():
     """Thread responsible for all gui updates, including inputs - keyboard and move -"""
@@ -139,10 +142,14 @@ class Gui():
                                     coord1 = int(move_coords[0])# move([0],[1])
                                     coord2 = int(move_coords[1])
 
-                                    self.board.move_human(coord1, coord2)
-                                    '''coords = eval(self.typing_text)
+                                    '''coords = eval(self.typing_text.split(" "))
                                     if type(coords) is tuple and all(type(n) is int for n in coords):
                                         self.board.move_human(*coords)'''
+                                    if len(move_coords)== 3:
+                                        coord3 = int(move_coords[2])
+                                        self.board.human_double(coord1, coord2, coord3, self.player_is_white)
+                                    else:
+                                        self.board.move_human(coord1, coord2, self.player_is_white)
                                     turn = 1
                                     self.is_cpu_turn = True
                                 except Exception as exp:
@@ -214,6 +221,10 @@ class Gui():
                     self.board.computerMove("black")
                 else:
                     self.board.computerMove("white")
+
+
+
+
 
             turn = 0
 if __name__ == '__main__':
