@@ -301,9 +301,9 @@ class Board:
         if possible_moves:
             next_move = possible_moves[ 0 ]
             self.make_move_computer(next_move)
-
         else:
             raise Exception ("No valid moves exist for computer.")
+
 
     def find_next_states(self, color):
         next_states = []
@@ -420,23 +420,20 @@ class Board:
                 del self.locations[fromCoordX+1, fromCoordY+1]
         #will allow to update for single moves
         if self.jumpFlag == 1:
-            #self.jumpFlag = 0
+            self.jumpFlag = 0
             del self.locations[fromCoord]
             fromPiece._set_pos(toCoord)
             next_moves = self.multiple_jump(toCoord, fromPiece)
-            if next_moves is not None:
-                print('''Next jump: ''')
-                print(next_moves)
+            if next_moves:
+            #is not None:
                 self.make_move_computer(next_moves)
-            else:
-                self.jumpFlag = 0
         else:
             del self.locations[fromCoord]
             fromPiece._set_pos(toCoord)
 
     def multiple_jump(self, fromCoord, fromPiece):
         (fromCoordX, fromCoordY) = fromCoord
-        new_moves = ((None, None), (None, None))
+        new_moves = []
 
         if fromPiece.is_white:
             moveLeft = (fromCoordX -1, fromCoordY -1)
@@ -458,7 +455,7 @@ class Board:
                     new_moves = (fromCoord, newMoveLeft)
                     return new_moves
             else:
-                return
+                print("i do nothing")
         elif not self.is_valid_move(fromCoord, moveRight, color):
             direction = "right"
             if self.computer_jump(fromCoord, moveRight, direction, color):
@@ -471,10 +468,9 @@ class Board:
                     new_moves = (fromCoord, newMoveLeft)
                     return new_moves
         else:
+
             return new_moves
-
         #fromPiece.is_king
-
 
     def computer_jump(self, fromSquare, toSquare, direction, color):
         #toPiece and fromPiece are piece objects
@@ -524,7 +520,6 @@ class Board:
             left_neighbor = (coordX -1, coordY-1)
 
         return possible_moves, possible_king_moves
-
 
     def check_king(self, fromPiece, CoordY):
 
