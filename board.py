@@ -125,19 +125,11 @@ class Board:
         fromPiece._set_pos((toCoord.x, toCoord.y))
         self.check_king(fromPiece, toCoord.y)
 
-<<<<<<< HEAD
-    def jump_move(self, toCoord, fromCoord, fromPiece, direction):
-        self.locations[(toCoord.x, toCoord.y)] = fromPiece
-        del self.locations[(fromCoord.x, fromCoord.y)]
-        fromPiece._set_pos((toCoord.x, toCoord.y))
-        print("from piece.pos is: ")
-        print(fromPiece.pos)
-=======
+
     def jump_move(self, toCoord, fromCoord, fromPiece):
         self.locations[(toCoord.x, toCoord.y)] = fromPiece
         del self.locations[(fromCoord.x, fromCoord.y)]
         fromPiece._set_pos((toCoord.x, toCoord.y))
->>>>>>> origin/master
 
         if fromPiece.is_white:
             if(toCoord.x > fromCoord.x) and toCoord.y<fromCoord.y:#forward, right
@@ -180,11 +172,6 @@ class Board:
         else:
             print("not a valid jump")
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
-
     def validate_input(self, fromPiece, player_is_white):
 
         if player_is_white and (not fromPiece.is_white):
@@ -194,63 +181,12 @@ class Board:
         else:
             return True
 
-<<<<<<< HEAD
-    def move_human(self, fromSquare, toSquare):
-=======
-    def move_human(self, fromSquare, toSquare, player_is_white):
->>>>>>> origin/master
 
+    def move_human(self, fromSquare, toSquare, player_is_white):
         fromCoord = self.numberToTupleKey[fromSquare]
         toCoord = self.numberToTupleKey[toSquare]
         fromPiece = self.locations.get(fromCoord, None)
         toPiece = self.locations.get(toCoord, None)
-<<<<<<< HEAD
-        if fromPiece and not toPiece:
-            if fromPiece.is_white:
-                if (toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y-1:
-                    self.single_move(toCoord, fromCoord, fromPiece)
-                elif (toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:
-                    if toCoord.x == fromCoord.x+2:
-                        direction = "right"
-                    else:
-                        direction = "left"
-                    self.jump_move(toCoord, fromCoord, fromPiece, direction)
-                elif fromPiece.is_king:
-                    if (toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x -1) and toCoord.y == fromCoord.y+1:
-                        self.single_move(toCoord, fromCoord, fromPiece)
-                    elif(toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x -2) and toCoord.y == fromCoord.y+2:
-                        if toCoord.x == fromCoord.x+2:
-                            direction = "right"
-                        else:
-                            direction = "left"
-                        self.jump_move(toCoord, fromCoord, fromPiece, direction)
-                else:
-                    raise Exception("Invalid human move")
-            if not fromPiece.is_white:
-                if (toCoord.x == fromCoord.x + 1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y+1:
-                    self.single_move(toCoord, fromCoord, fromPiece)
-                elif (toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2:
-                    if toCoord.x == fromCoord.x+2:
-                        direction = "right"
-                    else:
-                        direction = "left"
-                    self.jump_move(toCoord, fromCoord, fromPiece, direction)
-                elif(fromPiece.is_king):
-                    if(toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y-1:
-                        self.single_move(toCoord, fromCoord, fromPiece)
-                    elif (toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:
-                        if toCoord.x == fromCoord.x+2:
-                            direction = "right"
-                        else:
-                            direction = "left"
-                    self.jump_move(toCoord, fromCoord, fromPiece, direction)
-
-                else:
-                    raise Exception("Invalid human move")
-        else:
-            raise Exception("Invalid human move!")
-=======
-
 
         if not self.validate_input(fromPiece, player_is_white):
            raise Exception ("Sorry, that is not a valid move")
@@ -354,8 +290,6 @@ class Board:
         else:
             raise Exception ("Invalid double move")
 
->>>>>>> origin/master
-
     def collidepoint(self, pos):
         return self.boardrect.collidepoint(pos)
 
@@ -363,31 +297,11 @@ class Board:
         possible_moves = self.find_next_states(color)
     # Choose a move somehow... for now you can probably do:
         if possible_moves:
-<<<<<<< HEAD
             next_move = possible_moves[ 0 ]
             self.make_move_computer(next_move)
 
-=======
-            next_move = possible_moves[0]
->>>>>>> origin/master
-            #check to see if anotherJump has already occurred and if there isn't a new jump to be made
-            '''if self.anotherJump and self.jumpFlag == 0:
-                self.anotherJump = False
-                return
-            #check to see if a jump has been made
-            elif self.jumpFlag == 1:
-                self.make_move_computer(next_move)
-                self.jumpFlag = 0
-                self.anotherJump = True
-                #can i somehow use the specific piece that just moved?
-                self.computerMove(color)
-            #should be single move
-            elif self.jumpFlag == 0 and not self.anotherJump:
-                self.make_move_computer(next_move)'''
         else:
             raise Exception ("No valid moves exist for computer.")
-
-
 
     def find_next_states(self, color):
         next_states = []
@@ -423,16 +337,12 @@ class Board:
         else:
             moveToLeft = (coordX - 1, coordY - 1)
             moveToRight = (coordX + 1, coordY - 1)
-<<<<<<< HEAD
     #   jump move
         if not self.is_valid_move(fromSquare, moveToLeft, color):
-=======
             #if piece.is_king:
             #    moveBackLeft = (coordX-1, coordY+1)
             #   moveBackRight = (coordX+1, coordY+1)
-#       jump move
-        if not self.is_valid_move(fromSquare, moveToLeft):
->>>>>>> origin/master
+
             direction = "left"
             if self.computer_jump(fromSquare, moveToLeft, direction, color):
                 if color == "black":
@@ -499,7 +409,6 @@ class Board:
                 #if not self.right:
                 jumpedPiece = self.locations[(fromCoordX-1, fromCoordY+1)]
                 self.white_pieces.remove(jumpedPiece)
-<<<<<<< HEAD
                 del self.locations[fromCoordX-1, fromCoordY+1]
             #jump right forward and update board (forward to black side)
             elif self.jumpFlag == 1 and (fromCoordX < toCoordX) and (fromCoordY < toCoordY):
@@ -522,20 +431,6 @@ class Board:
     def multiple_jump(self, fromCoord, fromPiece):
         (fromCoordX, fromCoordY) = fromCoord
         new_moves = ((None, None), (None, None))
-=======
-                del self.locations[CoordX-1, CoordY+1]
-                self.check_king(fromPiece, CoordY)
-        #jump right and update board
-        elif self.jumpFlag == 1 and self.right == 0:
-                jumpedPiece = self.locations[(CoordX+1, CoordY+1)]
-                self.white_pieces.remove(jumpedPiece)
-                del self.locations[CoordX+1, CoordY+1]
-                self.check_king(fromPiece, CoordY)
-
-        del self.locations[fromCoord]
-        fromPiece._set_pos(toCoord)
-        self.check_king(fromPiece, CoordY)
->>>>>>> origin/master
 
         if fromPiece.is_white:
             moveLeft = (fromCoordX -1, fromCoordY -1)
@@ -619,22 +514,11 @@ class Board:
                 print("Something")
                 return possible_king_moves
         else:
-<<<<<<< HEAD
             right_neighbor = (coordX+1, coordY -1)
             left_neighbor = (coordX -1, coordY-1)
 
         return possible_moves, possible_king_moves
-=======
-            if direction == "left":
-                newToPiece = self.is_valid_move(fromPiece, doubleLeft)
-            elif direction == "right":
-                newToPiece = self.is_valid_move(fromPiece, doubleRight)
 
-            if newToPiece:
-                self.jumpFlag = 1
-                return True
-            return
->>>>>>> origin/master
 
     def check_king(self, fromPiece, CoordY):
 
@@ -649,10 +533,4 @@ class Board:
             if CoordY == 7:
                 fromPiece.make_king()
             else:
-<<<<<<< HEAD
                 return
-
-
-=======
-                return
->>>>>>> origin/master
