@@ -251,6 +251,41 @@ class Board:
                         raise Exception("Invalid human move")
             else:
                 raise Exception("Invalid human move!")
+    def check_for_human_jumps(self, player_is_white):
+        if player_is_white:
+            color = "white"
+        else:
+            color = "black"
+        jumps_exist = self.find_human_jumps(color)
+        self.jumpFlag = 0
+        return jumps_exist
+
+    def find_human_jumps(self, color):
+        next_states = []
+        if color == "black":
+            for piece in self.black_pieces:
+                valid_moves = self.find_valid_moves(piece, color)
+                (move, jump) = valid_moves
+                if jump:
+                    return True
+        else:
+            for piece in self.white_pieces:
+                valid_moves = self.find_valid_moves(piece, color)
+                (move, jump) = valid_moves
+                if jump:
+                    return True
+
+        return False
+
+    def is_jump_helper(self, coord_a, coord_b, player_is_white):
+        fromCoord = self.numberToTupleKey[coord_a]
+        fromPiece = self.locations.get(fromCoord, None)
+
+        if self.is_jump(fromPiece, coord_a, coord_b, player_is_white):
+            return True
+        else:
+            return False
+
     def is_jump(self, fromPiece, coord_a, coord_b, player_is_white):
         fromCoord = self.numberToTupleKey[coord_a]
         toCoord = self.numberToTupleKey[coord_b]
@@ -353,8 +388,8 @@ class Board:
                 else:
                     newMoveLeft = (coordX - 2, coordY - 2)
                     valid_jump_moves.append((fromSquare, newMoveLeft))
-            else:
-                print("i do nothing")
+            #else:
+            #    print("i do nothing")
         #single move
         else:
              valid_moves.append((fromSquare, moveToLeft))
@@ -368,8 +403,8 @@ class Board:
                 else:
                     newMoveRight = (coordX + 2, coordY - 2)
                     valid_jump_moves.append((fromSquare, newMoveRight))
-            else:
-                print("i do nothing")
+            #else:
+             #   print("i do nothing")
         #single move
         else:
              valid_moves.append((fromSquare, moveToRight))
@@ -420,24 +455,24 @@ class Board:
                 del self.locations[fromCoordX+1, fromCoordY+1]
         #will allow to update for single moves
         if self.jumpFlag == 1:
-            #self.jumpFlag = 0
+            self.jumpFlag = 0
             del self.locations[fromCoord]
             fromPiece._set_pos(toCoord)
             next_moves = self.multiple_jump(toCoord, fromPiece)
-            if next_moves is not None:
+            if next_moves:
                 print('''Next jump: ''')
                 print(next_moves)
                 self.make_move_computer(next_moves)
-            else:
-                self.jumpFlag = 0
+            #else:
+            #    self.jumpFlag = 0
         else:
             del self.locations[fromCoord]
             fromPiece._set_pos(toCoord)
 
     def multiple_jump(self, fromCoord, fromPiece):
         (fromCoordX, fromCoordY) = fromCoord
-        new_moves = ((None, None), (None, None))
-
+        #new_moves = ((None, None), (None, None))
+        new_moves = []
         if fromPiece.is_white:
             moveLeft = (fromCoordX -1, fromCoordY -1)
             moveRight = (fromCoordX +1, fromCoordY -1)
@@ -457,8 +492,8 @@ class Board:
                     newMoveLeft = (fromCoordX - 2, fromCoordY - 2)
                     new_moves = (fromCoord, newMoveLeft)
                     return new_moves
-            else:
-                return
+            #else:
+                #return
         elif not self.is_valid_move(fromCoord, moveRight, color):
             direction = "right"
             if self.computer_jump(fromCoord, moveRight, direction, color):
