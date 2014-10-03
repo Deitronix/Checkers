@@ -160,12 +160,12 @@ class Board:
                 self.white_pieces.remove(jumpedPiece)
                 self.check_king(fromPiece, toCoord.y)
             elif(toCoord.x>fromCoord.x) and toCoord.y<fromCoord.y:#backwards right
-                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]
-                del self.locations[fromCoord.x+1, fromCoord.y+1]
+                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y-1]
+                del self.locations[fromCoord.x+1, fromCoord.y-1]
                 self.white_pieces.remove(jumpedPiece)
             elif(toCoord.x<fromCoord.x) and toCoord.y<fromCoord.y:#backwards left
-                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y+1]
-                del self.locations[fromCoord.x-1, fromCoord.y+1]
+                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y-1]
+                del self.locations[fromCoord.x-1, fromCoord.y-1]
                 self.white_pieces.remove(jumpedPiece)
         else:
             print("not a valid jump")
@@ -241,7 +241,7 @@ class Board:
                                     raise Exception("Sorry, that is not a valid move")
                             else:
                                 jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y-1]#white backward left
-                                if jumpedPiece.is_white:
+                                if not jumpedPiece.is_white:
                                     raise Exception("Sorry, that is not a valid move")
                         self.jump_move(toCoord, fromCoord, fromPiece)
 
