@@ -495,8 +495,8 @@ class Board:
                     newMoveLeft = (fromCoordX - 2, fromCoordY - 2)
                     new_moves = (fromCoord, newMoveLeft)
                     return new_moves
-            #else:
-                #print("i do nothing")
+            else:
+                print("i do nothing")
         elif not self.is_valid_move(fromCoord, moveRight, color):
             direction = "right"
             if self.computer_jump(fromCoord, moveRight, direction, color):
