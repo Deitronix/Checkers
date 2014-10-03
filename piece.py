@@ -4,11 +4,8 @@ import pygame
 class Piece:
     """Contains information about a checkers piece. A piece is a pawn at creation,
     use make_king() to elevate."""
-    img_folder = "img/"
-    black_piece = img_folder+"black_piece.png"
-    white_piece = img_folder+"white_piece.png"
-    #screen
 
+    img_folder = "img/"
     def __init__(self, screen, is_white, pos, width, height, image):
         """Instantiates a piece object with given properties"""
 
@@ -22,6 +19,8 @@ class Piece:
 
         self.piece_image = image
         self.piece_image = pygame.transform.scale(self.piece_image, size)
+        self.king_image = pygame.image.load(self.img_folder+"king.png")
+        self.king_image = pygame.transform.scale(self.king_image, size)
 
     def make_king(self):
         """Sets this piece as king"""
@@ -30,6 +29,9 @@ class Piece:
 
     def draw(self):
         self.screen.blit(self.piece_image, (self.pos[0]*self.width, (self.pos[1])*self.height))
+        if self.is_king:
+            self.screen.blit(self.king_image, (self.pos[0]*self.width, (self.pos[1])*self.height))
+
     def _get_pos(self):
         return self.pos
 
