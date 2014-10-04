@@ -170,7 +170,7 @@ class Board:
         else:
             print("not a valid jump")
 
-    def validate_input(self, fromPiece, toPiece, player_is_white):
+    def validate_input(self, fromPiece, player_is_white):
 
         if player_is_white and (not fromPiece.is_white):
             return False
@@ -186,7 +186,7 @@ class Board:
         fromPiece = self.locations.get(fromCoord, None)
         toPiece = self.locations.get(toCoord, None)
 
-        if not self.validate_input(fromPiece, toPiece, player_is_white):
+        if not self.validate_input(fromPiece, player_is_white):
            raise Exception ("Sorry, that is not a valid move")
         else:
             if fromPiece and not toPiece:
@@ -220,7 +220,7 @@ class Board:
                             raise Exception("Invalid human move (test)")
                     else:
                         raise Exception("Invalid human move")
-                elif not fromPiece.is_white:
+                if not fromPiece.is_white:
                     if (toCoord.x == fromCoord.x + 1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y+1:
                         self.single_move(toCoord, fromCoord, fromPiece)
                     elif (toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2:
