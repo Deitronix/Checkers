@@ -63,6 +63,8 @@ class Gui():
         self.piece_is_selected = False
         self.selected_number = 0
 
+        self.playing = False
+
 
     def display(self, text):
         if text != "":
@@ -82,7 +84,8 @@ class Gui():
         text_offset = 0
         ratio_speed = 700
         direction = 1
-        while 1:
+        self.playing = True
+        while self.playing:
             while turn == 0:
                 for event in pygame.event.get():
                     if pygame.key.get_mods() & pygame.KMOD_ALT:
@@ -190,19 +193,17 @@ class Gui():
                 pygame.display.flip()
             else:
                 self.screen.blit(self.cpu_play, (self.bwidth, 0))
-
-                if True:
-                    #TODO Use CPU moves-check function ^
-                    # IF CPU HAS NO MOVES (board.cpu_has_moves?)
+                computer_played = False
+                if self.player_is_white:
+                    computer_played = self.board.computerMove("black")
+                else:
+                    computer_played = self.board.computerMove("white")
+                if not computer_played:
+                    # IF CPU HAS NO MOVES
                     self.screen.blit(self.human_win, (0,0))
                     self.after_game()
 
-                if self.player_is_white:
-                    self.board.computerMove("black")
-                else:
-                    self.board.computerMove("white")
-
-                if True:
+                if False:
                     #TODO Use human moves-check function ^
                     # IF HUMAN HAS NO MOVES (board.human_has_moves?)
                     self.screen.blit(self.cpu_win, (0,0))
@@ -257,8 +258,10 @@ class Gui():
 
         :return:
         """
-        pass
+        self.playing = False
+        pygame.display.flip()
 if __name__ == '__main__':
     gui = Gui()
     #Synchronize with inside comps
     gui.show()
+    input()

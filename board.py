@@ -344,9 +344,11 @@ class Board:
         if possible_moves:
             next_move = possible_moves[ 0 ]
             self.make_move_computer(next_move)
+            return True
         else:
             #raise Exception ("No valid moves exist for computer. Other Player wins")
             print("No valid moves exist for computer. Other Player wins")
+            return False
 
     def find_next_states(self, color):
         next_states = []
