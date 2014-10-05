@@ -23,6 +23,10 @@ class Gui():
         self.menu = pygame.image.load(img_folder+"main_menu.png")
         self.menu = pygame.transform.scale(self.menu, self.bsize)
         self.menurect = self.menu.get_rect()
+        self.human_win= pygame.image.load(img_folder+"human_win.png")
+        self.human_win = pygame.transform.scale(self.human_win, self.bsize)
+        self.cpu_win= pygame.image.load(img_folder+"cpu_win.png")
+        self.cpu_win = pygame.transform.scale(self.cpu_win, self.bsize)
         self.console = pygame.image.load(img_folder+"consolebg.png")
         self.console = pygame.transform.scale(self.console, (self.pwidth, self.wheight))
 
@@ -80,14 +84,14 @@ class Gui():
         direction = 1
         while 1:
             while turn == 0:
-                # TODO: GET TURN
                 for event in pygame.event.get():
                     if pygame.key.get_mods() & pygame.KMOD_ALT:
                         self.show_numbers = True
                     else:
                         self.show_numbers = False
                     if event.type == pygame.QUIT: sys.exit()
-                    if event.type == pygame.MOUSEBUTTONDOWN:
+
+                    if event.type == pygame.MOUSEBUTTONUP:
                         if self.inmenu:
                             pos = pygame.mouse.get_pos()
                             if pos[1] < self.bheight/2:
@@ -100,30 +104,23 @@ class Gui():
                                 self.player_is_white = False
                                 self.is_cpu_turn = False
                             self.inmenu = False
-                    if event.type == pygame.MOUSEBUTTONUP:
-                        if not self.inmenu:
+                        else:
                             pos = pygame.mouse.get_pos()
                             if self.board.collidepoint(pos):
-                                clicked_piece = []
-                                if self.player_is_white:
-                                    clicked_piece = [p for p in self.white_pieces if self.collide(p.pos, pos)]
-                                else:
-                                    clicked_piece = [p for p in self.black_pieces if self.collide(p.pos, pos)]
-                                if self.piece_is_selected:
-                                    if not len(clicked_piece)<0:
-                                        self.selected_number = 0
-                                        self.piece_is_selected = False
-                                    else:
-                                        new_selection = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
-                                        if new_selection == self.selected_number:
-                                            pass
-                                        else:
-                                            self.selected_number = new_selection
-                                elif len(clicked_piece):
-                                    self.selected_number = 4*clicked_piece[0].pos[1] + clicked_piece[0].pos[0]//2 + 1
-                                    self.typing_text += str(self.selected_number) + " "
+                                posx = pos[0]//self.board.pcwidth
+                                posy = pos[1]//self.board.pcheight
+                                try:
+                                    # Add selection to piece movement
+                                    selected_piece = self.board.locations[(posx,posy)]
                                     self.piece_is_selected = True
-                                    #TODO Finish selection process
+                                    self.selected_number = posy * 4 + posx // 2 + 1
+                                except KeyError :
+                                    #no piece exists at that position
+                                    if selected_piece.is_white == self.player_is_white:
+                                        if self.piece_is_selected:
+                                            to_location = posy * 4 + posx // 2 + 1
+                                            self.move("{} {}".format(self.selected_number, to_location))
+                                    self.piece_is_selected = False
 
                     if event.type == pygame.KEYDOWN:
                         # if not self.is_cpu_turn:
@@ -136,48 +133,18 @@ class Gui():
                             elif self.typing_text == "undo" or self.typing_text == "u":
                                 pass
                             else:
+                                # ---- HUMAN PLAY ----#
                                 self.display(self.typing_text)
-                                try:
-                                    user_jump_exists = False
-
-                                    move_coords = self.typing_text.split(" ")
-                                    coord1 = int(move_coords[0])# move([0],[1])
-                                    coord2 = int(move_coords[1])
-
-
-                                    #print(user_jump_exists)
-                                    '''coords = eval(self.typing_text.split(" "))
-                                    if type(coords) is tuple and all(type(n) is int for n in coords):
-                                        self.board.move_human(*coords)'''
-
-
-                                    if len(move_coords)== 3:
-                                        coord3 = int(move_coords[2])
-                                        self.board.human_double(coord1, coord2, coord3, self.player_is_white)
-                                    elif(self.board.check_for_human_jumps(self.player_is_white)):
-                                        #the user must jump
-
-                                        if self.board.is_jump_helper(coord1, coord2, self.player_is_white):
-                                            self.board.move_human(coord1, coord2, self.player_is_white)
-                                        else:
-                                            raise Exception ("You must take a jump when the situation arises")
-                                    else:
-                                        #no jump available, the user makes a normal use
-                                        self.board.move_human(coord1, coord2, self.player_is_white)
-
-
+                                if self.move(self.typing_text):
                                     turn = 1
-                                    self.is_cpu_turn = True
-                                except Exception as exp:
-                                    self.display("Invalid command - %s" %str(exp))
-                                    print (exp)
                                 self.typing_text = ""
+
                         if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
                             self.typing_text = self.typing_text[:-1]
                             self.typing_text = self.typing_text[:-1]
-
-
                 self.board.draw(self.inmenu)
+
+
                 fnt = pygame.font.SysFont("Calibri", self.font_size)
                 hintfnt = pygame.font.SysFont("monotype", self.font_size)
                 if self.inmenu:
@@ -186,6 +153,7 @@ class Gui():
                     self.screen.blit(self.console, (self.bwidth, 0))
                     self.screen.blit(self.cpu_play, (self.bwidth, 0))
                     # --- CONSOLE TEXT ---
+                    # Show numbers
                     if self.show_numbers:
                         count = 1
                         j = 0
@@ -200,16 +168,12 @@ class Gui():
                                 i += 1
                             j += 1
 
-                    #TODO - Wrap lines
                     # - Input display
                     text = fnt.render(">> "+self.typing_text+"_", 1, (0, 0, 0))
                     self.screen.blit(text, (self.bwidth, (self.max_display-1)*self.theight + self.pheight))
-                    if self.is_cpu_turn:
-                        self.screen.blit(self.cpu_play, (self.bwidth, 0))
-                    else:
-                        self.screen.blit(self.h_play, (self.bwidth, 0))
+                    self.screen.blit(self.h_play, (self.bwidth, 0))
 
-                        #-- Console display
+                    #-- Console display
                     i = 0
                     text_offset += direction
                     if text_offset<0 or text_offset>2*ratio_speed/3:
@@ -225,24 +189,75 @@ class Gui():
                         i += 1
                 pygame.display.flip()
             else:
-                # I don't think I need to create another thread.. it goes fast...
-                
-                """
-                p = Process(target=self.board.computerMove, args=(self,))
-                p.start()
-                p.join()
-                self.computer_is_ready = False
-                # """
+                self.screen.blit(self.cpu_play, (self.bwidth, 0))
+
+                if True:
+                    #TODO Use CPU moves-check function ^
+                    # IF CPU HAS NO MOVES (board.cpu_has_moves?)
+                    self.screen.blit(self.human_win, (0,0))
+                    self.after_game()
+
                 if self.player_is_white:
                     self.board.computerMove("black")
                 else:
                     self.board.computerMove("white")
 
-
-
-
+                if True:
+                    #TODO Use human moves-check function ^
+                    # IF HUMAN HAS NO MOVES (board.human_has_moves?)
+                    self.screen.blit(self.cpu_win, (0,0))
+                    self.after_game()
 
             turn = 0
+
+    def move(self, display_text):
+        """
+        Method for human play, through a string with the squares to use (Example: "23 11")
+
+        :param display_text: string containing the squares for the play
+        :return: True if human playe correctly
+        """
+        try:
+            user_jump_exists = False
+
+            move_coords = self.typing_text.split(" ")
+            coord1 = int(move_coords[0])# move([0],[1])
+            coord2 = int(move_coords[1])
+
+
+            #print(user_jump_exists)
+            '''coords = eval(self.typing_text.split(" "))
+            if type(coords) is tuple and all(type(n) is int for n in coords):
+                self.board.move_human(*coords)'''
+
+
+            if len(move_coords)== 3:
+                coord3 = int(move_coords[2])
+                self.board.human_double(coord1, coord2, coord3, self.player_is_white)
+            elif(self.board.check_for_human_jumps(self.player_is_white)):
+                #the user must jump
+
+                if self.board.is_jump_helper(coord1, coord2, self.player_is_white):
+                    self.board.move_human(coord1, coord2, self.player_is_white)
+                else:
+                    raise Exception ("You must take a jump when the situation arises")
+            else:
+                #no jump available, the user makes a normal use
+                self.board.move_human(coord1, coord2, self.player_is_white)
+            self.is_cpu_turn = True
+            return True
+        except Exception as exp:
+            self.display("Invalid command - %s" %str(exp))
+            print (exp)
+            return False
+
+    def after_game(self):
+        """
+        This method will be called when the game is over
+
+        :return:
+        """
+        pass
 if __name__ == '__main__':
     gui = Gui()
     #Synchronize with inside comps
