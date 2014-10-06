@@ -220,37 +220,37 @@ class Gui():
         """
         try:
             user_jump_exists = False
+            if self.board.check_for_human_moves(self.player_is_white):
+                move_coords = self.typing_text.split(" ")
+                coord1 = int(move_coords[0])# move([0],[1])
+                coord2 = int(move_coords[1])
 
-            move_coords = self.typing_text.split(" ")
-            coord1 = int(move_coords[0])# move([0],[1])
-            coord2 = int(move_coords[1])
+                #print(user_jump_exists)
+                '''coords = eval(self.typing_text.split(" "))
+                if type(coords) is tuple and all(type(n) is int for n in coords):
+                    self.board.move_human(*coords)'''
 
+                if len(move_coords)== 3:
+                    coord3 = int(move_coords[2])
+                    self.board.human_double(coord1, coord2, coord3, self.player_is_white)
+                elif(self.board.check_for_human_jumps(self.player_is_white)):
+                    #the user must jump
 
-            #print(user_jump_exists)
-            '''coords = eval(self.typing_text.split(" "))
-            if type(coords) is tuple and all(type(n) is int for n in coords):
-                self.board.move_human(*coords)'''
-
-
-            if len(move_coords)== 3:
-                coord3 = int(move_coords[2])
-                self.board.human_double(coord1, coord2, coord3, self.player_is_white)
-            elif(self.board.check_for_human_jumps(self.player_is_white)):
-                #the user must jump
-
-                if self.board.is_jump_helper(coord1, coord2, self.player_is_white):
-                    self.board.move_human(coord1, coord2, self.player_is_white)
+                    if self.board.is_jump_helper(coord1, coord2, self.player_is_white):
+                        self.board.move_human(coord1, coord2, self.player_is_white)
+                    else:
+                        raise Exception ("You must take a jump when the situation arises")
                 else:
-                    raise Exception ("You must take a jump when the situation arises")
+                    #no jump available, the user makes a normal use
+                    self.board.move_human(coord1, coord2, self.player_is_white)
+                self.is_cpu_turn = True
+                return True
             else:
-                #no jump available, the user makes a normal use
-                self.board.move_human(coord1, coord2, self.player_is_white)
-            self.is_cpu_turn = True
-            return True
+                raise Exception ("There are no valid moves left for the human player")
         except Exception as exp:
-            self.display("Invalid command - %s" %str(exp))
-            print (exp)
-            return False
+                self.display("Invalid command - %s" %str(exp))
+                print (exp)
+                return False
 
     def after_game(self):
         """
