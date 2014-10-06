@@ -11,7 +11,6 @@ class Gui():
     """Thread responsible for all gui updates, including inputs - keyboard and move -"""
 
     def __init__(self):
-        threading.Thread.__init__(self)
         pygame.init()
         img_folder = "img/"
         self.bsize = self.bwidth, self.bheight = 600, 600

@@ -2,6 +2,7 @@
 Board.py - this file creates a representation of a game board and embodies all the game logic including
 human and computer moving, jump pieces, kinging piece, and win conditions.
 '''
+from pygame.examples import scrap_clipboard
 
 from piece import Piece
 import pygame
@@ -486,6 +487,11 @@ class Board:
         self.locations[toCoord] = fromPiece
         (fromCoordX, fromCoordY) = fromCoord
         (toCoordX, toCoordY) = toCoord
+        # -- Display computer move ---
+        fromSq = fromCoordY * 4 + fromCoordX//2 + 1
+        toSq = toCoordY * 4 + toCoordX//2 + 1
+        print("Computer move: {} - {}".format(fromSq, toSq))
+
 
         #check to see what color is being played and what needs to be removed
         if fromPiece.is_white:
