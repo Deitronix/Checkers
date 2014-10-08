@@ -541,14 +541,10 @@ class Board:
             fromPiece._set_pos(toCoord)
 
             if not fromPiece.is_king:
-                if fromPiece.is_white:
-                    self.check_king(fromPiece, fromCoordY - 2)
-                    if fromPiece.is_king:
-                        return
-                else:
-                    self.check_king(fromPiece, fromCoordY + 2)
-                    if fromPiece.is_king:
-                        return
+                self.check_king(fromPiece, toCoordY)
+                if fromPiece.is_king:
+                    return
+
             next_moves = self.multiple_jump(toCoord, fromPiece)
             if next_moves:
             #is not None:
