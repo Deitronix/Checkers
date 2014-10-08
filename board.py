@@ -539,7 +539,16 @@ class Board:
             self.jumpFlag = 0
             del self.locations[fromCoord]
             fromPiece._set_pos(toCoord)
-            self.check_king(fromPiece, toCoordY)
+
+            if not fromPiece.is_king:
+                if fromPiece.is_white:
+                    self.check_king(fromPiece, fromCoordY - 2)
+                    if fromPiece.is_king:
+                        return
+                else:
+                    self.check_king(fromPiece, fromCoordY + 2)
+                    if fromPiece.is_king:
+                        return
             next_moves = self.multiple_jump(toCoord, fromPiece)
             if next_moves:
             #is not None:
@@ -552,6 +561,7 @@ class Board:
     def multiple_jump(self, fromCoord, fromPiece):
         (fromCoordX, fromCoordY) = fromCoord
         new_moves = []
+
 
         if fromPiece.is_white:
             color = "white"
@@ -652,7 +662,6 @@ class Board:
         else:
 
             return new_moves
-        #fromPiece.is_king
 
     def computer_jump(self, fromSquare, toSquare, direction, color):
         #toPiece and fromPiece are piece objects
