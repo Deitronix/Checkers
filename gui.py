@@ -111,7 +111,7 @@ class Gui():
                             if self.board.collidepoint(pos):
                                 posx = pos[0]//self.board.pcwidth
                                 posy = pos[1]//self.board.pcheight
-                                try:
+                            '''    try:
                                     # Add selection to piece movement
                                     selected_piece = self.board.locations[(posx,posy)]
                                     self.piece_is_selected = True
@@ -122,7 +122,7 @@ class Gui():
                                         if self.piece_is_selected:
                                             to_location = posy * 4 + posx // 2 + 1
                                             self.move("{} {}".format(self.selected_number, to_location))
-                                    self.piece_is_selected = False
+                                    self.piece_is_selected = False'''
 
                     if event.type == pygame.KEYDOWN:
                         # if not self.is_cpu_turn:

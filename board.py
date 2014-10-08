@@ -621,7 +621,7 @@ class Board:
                         new_moves = (fromCoord, newMoveRight)
                         return new_moves
                     direction = "forwardRight"
-                    if not self.is_valid_move(fromCoord, forwardRight, color):
+                    if self.computer_jump(fromCoord, forwardRight, direction, color):
                         newMoveRight = (fromCoordX + 2, fromCoordY - 2)
                         new_moves = (fromCoord, newMoveRight)
                         return new_moves
