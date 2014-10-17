@@ -219,7 +219,9 @@ class Gui():
         """
         try:
             user_jump_exists = False
+
             if self.board.check_for_human_moves(self.player_is_white):
+
                 move_coords = self.typing_text.split(" ")
                 coord1 = int(move_coords[0])# move([0],[1])
                 coord2 = int(move_coords[1])
@@ -232,10 +234,13 @@ class Gui():
                 if len(move_coords)== 3:
                     coord3 = int(move_coords[2])
                     self.board.human_double(coord1, coord2, coord3, self.player_is_white)
-                elif(self.board.check_for_human_jumps(self.player_is_white)):
+
+
+                #elif(self.board.check_for_human_jumps(self.player_is_white)):
+                elif self.board.find_human_jumps(self.player_is_white):
                     #the user must jump
 
-                    if self.board.is_jump_helper(coord1, coord2, self.player_is_white):
+                    if self.board.is_jump(coord1, coord2, self.player_is_white):
                         self.board.move_human(coord1, coord2, self.player_is_white)
                     else:
                         raise Exception ("You must take a jump when the situation arises")
