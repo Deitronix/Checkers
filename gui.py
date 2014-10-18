@@ -229,7 +229,7 @@ class Gui():
                 #print(user_jump_exists)
                 '''coords = eval(self.typing_text.split(" "))
                 if type(coords) is tuple and all(type(n) is int for n in coords):
-                    self.board.move_human(*coords)'''
+                    self.board.human_controller(*coords)'''
 
                 if len(move_coords)== 3:
                     coord3 = int(move_coords[2])
@@ -241,12 +241,12 @@ class Gui():
                     #the user must jump
 
                     if self.board.is_jump(coord1, coord2, self.player_is_white):
-                        self.board.move_human(coord1, coord2, self.player_is_white)
+                        self.board.human_controller(coord1, coord2, self.player_is_white)
                     else:
                         raise Exception ("You must take a jump when the situation arises")
                 else:
                     #no jump available, the user makes a normal use
-                    self.board.move_human(coord1, coord2, self.player_is_white)
+                    self.board.human_controller(coord1, coord2, self.player_is_white)
                 self.is_cpu_turn = True
                 return True
             else:

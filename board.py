@@ -15,51 +15,14 @@ class Board:
     white_pieces = list()
     img_folder = "img/"
 
-    #setting data structures for internal
-    Coordinate = namedtuple('Coordinate', 'x, y')
-    coordinate1 = Coordinate(1, 0)
-    coordinate2 = Coordinate(3, 0)
-    coordinate3 = Coordinate(5, 0)
-    coordinate4 = Coordinate(7, 0)
-    coordinate5 = Coordinate(0, 1)
-    coordinate6 = Coordinate(2, 1)
-    coordinate7 = Coordinate(4, 1)
-    coordinate8 = Coordinate(6, 1)
-    coordinate9 = Coordinate(1, 2)
-    coordinate10 = Coordinate(3, 2)
-    coordinate11 = Coordinate(5, 2)
-    coordinate12 = Coordinate(7, 2)
-    coordinate13 = Coordinate(0, 3)
-    coordinate14 = Coordinate(2, 3)
-    coordinate15 = Coordinate(4, 3)
-    coordinate16 = Coordinate(6, 3)
-    coordinate17 = Coordinate(1, 4)
-    coordinate18 = Coordinate(3, 4)
-    coordinate19 = Coordinate(5, 4)
-    coordinate20 = Coordinate(7, 4)
-    coordinate21 = Coordinate(0, 5)
-    coordinate22 = Coordinate(2, 5)
-    coordinate23 = Coordinate(4, 5)
-    coordinate24 = Coordinate(6, 5)
-    coordinate25 = Coordinate(1, 6)
-    coordinate26 = Coordinate(3, 6)
-    coordinate27 = Coordinate(5, 6)
-    coordinate28 = Coordinate(7, 6)
-    coordinate29 = Coordinate(0, 7)
-    coordinate30 = Coordinate(2, 7)
-    coordinate31 = Coordinate(4, 7)
-    coordinate32 = Coordinate(6, 7)
-
-    numberToTupleKey= {1: coordinate1, 2: coordinate2, 3: coordinate3, 4: coordinate4,
-                       5: coordinate5, 6: coordinate6,   7: coordinate7, 8: coordinate8,
-                       9: coordinate9,  10: coordinate10, 11: coordinate11, 12: coordinate12,
-                       13: coordinate13,  14: coordinate14, 15: coordinate15, 16: coordinate16,
-                       17: coordinate17,  18: coordinate18, 19: coordinate19, 20: coordinate20,
-                       21: coordinate21,  22: coordinate22, 23: coordinate23, 24: coordinate24,
-                       25: coordinate25,  26: coordinate26, 27: coordinate27, 28: coordinate28,
-                       29: coordinate29, 30: coordinate30, 31: coordinate31, 32: coordinate32}
-
-
+    numberToCoordinates = {1: (1, 0), 2: (3, 0), 3: (5, 0), 4: (7, 0),
+                           5: (0, 1), 6: (2, 1), 7: (4,1), 8: (6, 1),
+                           9: (1, 2), 10: (3, 2), 11: (5, 2), 12: (7, 2),
+                           13: (0, 3), 14: (2, 3), 15: (4, 3), 16: (6, 3),
+                           17: (1, 4), 18: (3, 4), 19: (5, 4), 20: (7, 4),
+                           21: (0, 5), 22: (2, 5), 23: (4, 5), 24: (6, 5),
+                           25: (1, 6), 26: (3, 6), 27: (5, 6), 28: (7, 6),
+                           29: (0,7), 30: (2, 7), 31: (4, 7), 32: (6, 7)}
 
 
     def __init__(self, screen, width, height):
@@ -118,59 +81,81 @@ class Board:
 
 
 
-    def single_move(self, toCoord, fromCoord, fromPiece):
-        self.locations[(toCoord.x, toCoord.y)] = fromPiece
-        del self.locations[(fromCoord.x, fromCoord.y)]
 
-        fromPiece._set_pos((toCoord.x, toCoord.y))
-        self.check_king(fromPiece, toCoord.y)
+#####################################################################################################################
+    def human_controller(self, fromSquare, toSquare, player_is_white):
+        fromCoord = self.numberToCoordinates[fromSquare]
+        toCoord = self.numberToCoordinates[toSquare]
+        fromPiece = self.locations.get(fromCoord, None)
+        toPiece = self.locations.get(toCoord, None)
 
-
-    def jump_move(self, toCoord, fromCoord, fromPiece):
-        self.locations[(toCoord.x, toCoord.y)] = fromPiece
-        del self.locations[(fromCoord.x, fromCoord.y)]
-        fromPiece._set_pos((toCoord.x, toCoord.y))
-
-        if fromPiece.is_white:
-            if(toCoord.x > fromCoord.x) and toCoord.y<fromCoord.y:#forward, right
-                jumpedPiece = self.locations[(fromCoord.x+1, fromCoord.y-1)]
-                del self.locations[fromCoord.x+1, fromCoord.y-1]
-                self.black_pieces.remove(jumpedPiece)
-                self.check_king(fromPiece, toCoord.y)
-            elif(toCoord.x < fromCoord.x) and toCoord.y<fromCoord.y: #forward left
-                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y-1]
-                del self.locations[fromCoord.x-1, fromCoord.y-1]
-                self.black_pieces.remove(jumpedPiece)
-                self.check_king(fromPiece, toCoord.y)
-            elif fromPiece.is_king and ((toCoord.x > fromCoord.x) and toCoord.y>fromCoord.y):#backward right for kings
-                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]
-                del self.locations[fromCoord.x+1, fromCoord.y+1]
-                self.black_pieces.remove(jumpedPiece)
-            elif fromPiece.is_king and ((toCoord.x < fromCoord.x) and toCoord.y>fromCoord.y):#backward left for kings
-                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y+1]
-                del self.locations[fromCoord.x-1, fromCoord.y+1]
-                self.black_pieces.remove(jumpedPiece)
-        elif not fromPiece.is_white:
-            if(toCoord.x>fromCoord.x) and toCoord.y>fromCoord.y:#forward right
-                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]
-                del self.locations[fromCoord.x+1, fromCoord.y+1]
-                self.white_pieces.remove(jumpedPiece)
-                self.check_king(fromPiece, toCoord.y)
-            elif(toCoord.x<fromCoord.x) and toCoord.y>fromCoord.y:#forward left
-                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y+1]
-                del self.locations[fromCoord.x-1, fromCoord.y+1]
-                self.white_pieces.remove(jumpedPiece)
-                self.check_king(fromPiece, toCoord.y)
-            elif(toCoord.x>fromCoord.x) and toCoord.y<fromCoord.y:#backwards right
-                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y-1]
-                del self.locations[fromCoord.x+1, fromCoord.y-1]
-                self.white_pieces.remove(jumpedPiece)
-            elif(toCoord.x<fromCoord.x) and toCoord.y<fromCoord.y:#backwards left
-                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y-1]
-                del self.locations[fromCoord.x-1, fromCoord.y-1]
-                self.white_pieces.remove(jumpedPiece)
+        if not self.validate_input(fromPiece, player_is_white):
+           raise Exception ("Sorry, that is not a valid move")
         else:
-            print("not a valid jump")
+            if fromPiece and not toPiece:
+                if fromPiece.is_white:
+                    if (toCoord[0] == fromCoord[0]+1 or toCoord[0] == fromCoord[0] - 1) and toCoord[1]== fromCoord[1]-1:
+                         self.single_move(toCoord, fromCoord, fromPiece)
+                    elif (toCoord[0] == fromCoord[0]+2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]-2:
+                        if toCoord[0] == fromCoord[0]+2:
+                            jumpedPiece = self.locations[fromCoord[0]+1, fromCoord[1]-1]#white forward right
+                            if jumpedPiece.is_white:
+                                raise Exception("Sorry, that is not a valid move")
+                        else:
+                            jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]-1]#white forward left
+                            if jumpedPiece.is_white:
+                                raise Exception("Sorry, that is not a valid move")
+                        self.jump_move(toCoord, fromCoord, fromPiece)
+                    elif fromPiece.is_king:
+                        if (toCoord[0] == fromCoord[0]+1 or toCoord[0] == fromCoord[0] -1) and toCoord[1] == fromCoord[1]+1:
+                            self.single_move(toCoord, fromCoord, fromPiece)
+                        elif(toCoord[0] == fromCoord[0]+2 or toCoord[0] == fromCoord[0] -2) and toCoord[1] == fromCoord[1]+2:
+                            if toCoord[0]== fromCoord[0]+2:
+                                jumpedPiece = self.locations[fromCoord[0]+1, fromCoord[1]+1]#white backward right
+                                if jumpedPiece.is_white:
+                                    raise Exception("Sorry, that is not a valid move")
+                            else:
+                                jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]+1]#white backward left
+                                if jumpedPiece.is_white:
+                                    raise Exception("Sorry, that is not a valid move")
+                            self.jump_move(toCoord, fromCoord, fromPiece)
+                        else:
+                            raise Exception("Invalid human move (test)")
+                    else:
+                        raise Exception("Invalid human move")
+                if not fromPiece.is_white:
+                    if (toCoord[0] == fromCoord[0] + 1 or toCoord[0] == fromCoord[0] - 1) and toCoord[1] == fromCoord[1]+1:
+                        self.single_move(toCoord, fromCoord, fromPiece)
+                    elif (toCoord[0] == fromCoord[0] + 2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]+2:
+                        if toCoord[0] == fromCoord[0]+2:
+                            jumpedPiece = self.locations[fromCoord[0]+1, fromCoord[1]+1]#black forward right
+                            if not jumpedPiece.is_white:
+                                raise Exception("Sorry, that is not a valid move")
+                        else:
+                            jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]+1]#black backward left
+                            if not jumpedPiece.is_white:
+                                raise Exception("Sorry, that is not a valid move")
+                        self.jump_move(toCoord, fromCoord, fromPiece)
+                    elif(fromPiece.is_king):
+                        if(toCoord[0] == fromCoord[0]+1 or toCoord[0] == fromCoord[0] - 1) and toCoord[1] == fromCoord[1]-1:
+                            self.single_move(toCoord, fromCoord, fromPiece)
+                        elif (toCoord[0] == fromCoord[0]+2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]-2:
+                            if toCoord[0] == fromCoord[0]+2:
+                                jumpedPiece = self.locations[fromCoord[0]+1, fromCoord[1]-1]#black backward right
+                                if not jumpedPiece.is_white:
+                                    raise Exception("Sorry, that is not a valid move")
+                            else:
+                                jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]-1]#white backward left
+                                if not jumpedPiece.is_white:
+                                    raise Exception("Sorry, that is not a valid move")
+                            self.jump_move(toCoord, fromCoord, fromPiece)
+                        else:
+                            raise Exception("Invalid human move (test)")
+                    else:
+                        raise Exception("Invalid human move")
+            else:
+                raise Exception("Invalid human move!")
+
 
     def validate_input(self, fromPiece, player_is_white):
 
@@ -181,6 +166,61 @@ class Board:
         else:
             return True
 
+    def single_move(self, toCoord, fromCoord, fromPiece):
+
+
+        self.locations[(toCoord[0], toCoord[1])] = fromPiece
+        del self.locations[(fromCoord[0], fromCoord[1])]
+
+        fromPiece._set_pos((toCoord[0], toCoord[1]))
+        self.check_king(fromPiece, toCoord[1])
+
+
+    def jump_move(self, toCoord, fromCoord, fromPiece):
+        self.locations[(toCoord[0], toCoord[1])] = fromPiece
+        del self.locations[(fromCoord[0], fromCoord[1])]
+        fromPiece._set_pos((toCoord[0], toCoord[1]))
+
+        if fromPiece.is_white:
+            if(toCoord[0] > fromCoord[0]) and toCoord[1]<fromCoord[1]:#forward, right
+                jumpedPiece = self.locations[(fromCoord[0]+1, fromCoord[1]-1)]
+                del self.locations[fromCoord[0]+1, fromCoord[1]-1]
+                self.black_pieces.remove(jumpedPiece)
+                self.check_king(fromPiece, toCoord[1])
+            elif(toCoord[0] < fromCoord[0]) and toCoord[1]<fromCoord[1]: #forward left
+                jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]-1]
+                del self.locations[fromCoord[0]-1, fromCoord[1]-1]
+                self.black_pieces.remove(jumpedPiece)
+                self.check_king(fromPiece, toCoord[1])
+            elif fromPiece.is_king and ((toCoord[0] > fromCoord[0]) and toCoord[1]>fromCoord[1]):#backward right for kings
+                jumpedPiece = self.locations[fromCoord[0]+1, fromCoord[1]+1]
+                del self.locations[fromCoord[0]+1, fromCoord[1]+1]
+                self.black_pieces.remove(jumpedPiece)
+            elif fromPiece.is_king and ((toCoord[0] < fromCoord[0]) and toCoord[1]>fromCoord[1]):#backward left for kings
+                jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]+1]
+                del self.locations[fromCoord[0]-1, fromCoord[1]+1]
+                self.black_pieces.remove(jumpedPiece)
+        elif not fromPiece.is_white:
+            if(toCoord[0]>fromCoord[0]) and toCoord[1]>fromCoord[1]:#forward right
+                jumpedPiece = self.locations[fromCoord[0]+1, fromCoord[1]+1]
+                del self.locations[fromCoord[0]+1, fromCoord[1]+1]
+                self.white_pieces.remove(jumpedPiece)
+                self.check_king(fromPiece, toCoord[1])
+            elif(toCoord[0]<fromCoord[0]) and toCoord[1]>fromCoord[1]:#forward left
+                jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]+1]
+                del self.locations[fromCoord[0]-1, fromCoord[1]+1]
+                self.white_pieces.remove(jumpedPiece)
+                self.check_king(fromPiece, toCoord[1])
+            elif(toCoord[0]>fromCoord[0]) and toCoord[1]<fromCoord[1]:#backwards right
+                jumpedPiece = self.locations[fromCoord[0]+1, fromCoord[1]-1]
+                del self.locations[fromCoord[0]+1, fromCoord[1]-1]
+                self.white_pieces.remove(jumpedPiece)
+            elif(toCoord[0]<fromCoord[0]) and toCoord[1]<fromCoord[1]:#backwards left
+                jumpedPiece = self.locations[fromCoord[0]-1, fromCoord[1]-1]
+                del self.locations[fromCoord[0]-1, fromCoord[1]-1]
+                self.white_pieces.remove(jumpedPiece)
+        else:
+            print("not a valid jump")
     def check_for_human_moves(self, player_is_white):
         if player_is_white:
             color = "white"
@@ -204,81 +244,6 @@ class Board:
                     return True
 
         return False
-
-
-    def move_human(self, fromSquare, toSquare, player_is_white):
-        fromCoord = self.numberToTupleKey[fromSquare]
-        toCoord = self.numberToTupleKey[toSquare]
-        fromPiece = self.locations.get(fromCoord, None)
-        toPiece = self.locations.get(toCoord, None)
-
-        if not self.validate_input(fromPiece, player_is_white):
-           raise Exception ("Sorry, that is not a valid move")
-        else:
-            if fromPiece and not toPiece:
-                if fromPiece.is_white:
-                    if (toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y-1:
-                         self.single_move(toCoord, fromCoord, fromPiece)
-                    elif (toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:
-                        if toCoord.x == fromCoord.x+2:
-                            jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y-1]#white forward right
-                            if jumpedPiece.is_white:
-                                raise Exception("Sorry, that is not a valid move")
-                        else:
-                            jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y-1]#white forward left
-                            if jumpedPiece.is_white:
-                                raise Exception("Sorry, that is not a valid move")
-                        self.jump_move(toCoord, fromCoord, fromPiece)
-                    elif fromPiece.is_king:
-                        if (toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x -1) and toCoord.y == fromCoord.y+1:
-                            self.single_move(toCoord, fromCoord, fromPiece)
-                        elif(toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x -2) and toCoord.y == fromCoord.y+2:
-                            if toCoord.x == fromCoord.x+2:
-                                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]#white backward right
-                                if jumpedPiece.is_white:
-                                    raise Exception("Sorry, that is not a valid move")
-                            else:
-                                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y+1]#white backward left
-                                if jumpedPiece.is_white:
-                                    raise Exception("Sorry, that is not a valid move")
-                            self.jump_move(toCoord, fromCoord, fromPiece)
-                        else:
-                            raise Exception("Invalid human move (test)")
-                    else:
-                        raise Exception("Invalid human move")
-                if not fromPiece.is_white:
-                    if (toCoord.x == fromCoord.x + 1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y+1:
-                        self.single_move(toCoord, fromCoord, fromPiece)
-                    elif (toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2:
-                        if toCoord.x == fromCoord.x+2:
-                            jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y+1]#black forward right
-                            if not jumpedPiece.is_white:
-                                raise Exception("Sorry, that is not a valid move")
-                        else:
-                            jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y+1]#black backward left
-                            if not jumpedPiece.is_white:
-                                raise Exception("Sorry, that is not a valid move")
-                        self.jump_move(toCoord, fromCoord, fromPiece)
-                    elif(fromPiece.is_king):
-                        if(toCoord.x == fromCoord.x+1 or toCoord.x == fromCoord.x - 1) and toCoord.y == fromCoord.y-1:
-                            self.single_move(toCoord, fromCoord, fromPiece)
-                        elif (toCoord.x == fromCoord.x+2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:
-                            if toCoord.x == fromCoord.x+2:
-                                jumpedPiece = self.locations[fromCoord.x+1, fromCoord.y-1]#black backward right
-                                if not jumpedPiece.is_white:
-                                    raise Exception("Sorry, that is not a valid move")
-                            else:
-                                jumpedPiece = self.locations[fromCoord.x-1, fromCoord.y-1]#white backward left
-                                if not jumpedPiece.is_white:
-                                    raise Exception("Sorry, that is not a valid move")
-                            self.jump_move(toCoord, fromCoord, fromPiece)
-                        else:
-                            raise Exception("Invalid human move (test)")
-                    else:
-                        raise Exception("Invalid human move")
-            else:
-                raise Exception("Invalid human move!")
-
 
     def find_human_jumps(self, player_is_white):
         if player_is_white:
@@ -305,24 +270,23 @@ class Board:
         return False
 
     def is_jump(self, coord_a, coord_b, player_is_white):
-        fromCoord = self.numberToTupleKey[coord_a]
+        fromCoord = self.numberToCoordinates[coord_a]
         fromPiece = self.locations.get(fromCoord, None)
-        fromCoord = self.numberToTupleKey[coord_a]
-        toCoord = self.numberToTupleKey[coord_b]
-
+        fromCoord = self.numberToCoordinates[coord_a]
+        toCoord = self.numberToCoordinates[coord_b]
 
         if player_is_white:
-            if(toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y-2:#forward, right or forward left
+            if(toCoord[0] == fromCoord[0] + 2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]-2:#forward, right or forward left
                 return True
-            elif fromPiece.is_king and ((toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2):#backward right, left for kings
+            elif fromPiece.is_king and ((toCoord[0] == fromCoord[0] + 2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]+2):#backward right, left for kings
                 return True
 
             else:
                 return False
         elif not player_is_white:
-            if(toCoord.x == fromCoord.x + 2 or toCoord.x == fromCoord.x - 2) and toCoord.y == fromCoord.y+2:#forward right or left
+            if(toCoord[0] == fromCoord[0] + 2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]+2:#forward right or left
                 return True
-            elif fromPiece.is_king and ((toCoord.x == fromCoord.x + 2 or toCoord.x ==fromCoord.x - 2) and toCoord.y == fromCoord.y-2):#backwards right, left
+            elif fromPiece.is_king and ((toCoord[0] == fromCoord[0] + 2 or toCoord[0] ==fromCoord[0] - 2) and toCoord[1] == fromCoord[1]-2):#backwards right, left
                 return True
 
             else:
@@ -333,16 +297,16 @@ class Board:
 
     def human_double(self, coord1, coord2, coord3, player_is_white):
 
-        fromCoord = self.numberToTupleKey[coord1]
+        fromCoord = self.numberToCoordinates[coord1]
         fromPiece = self.locations.get(fromCoord, None)
         (coordX, coordY) = fromCoord
 
         if self.is_jump(coord1, coord2, player_is_white) and self.is_jump(coord2, coord3, player_is_white):
-                self.move_human(coord1, coord2, player_is_white)
-                self.move_human(coord2, coord3, player_is_white)
+                self.human_controller(coord1, coord2, player_is_white)
+                self.human_controller(coord2, coord3, player_is_white)
         else:
             raise Exception ("Invalid double move")
-#####################################################################################################################
+
 #####################################################################################################################
 
     def computerMove(self, color):
@@ -708,9 +672,6 @@ class Board:
                         newToPiece = True
                     elif self.is_valid_move(fromPiece, forwardJumpRight, color):
                         newToPiece = True
-
-
-
 
                 if newToPiece and newToKingPiece:
                     self.jumpFlag = 1
