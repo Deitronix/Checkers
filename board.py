@@ -420,7 +420,6 @@ class Board:
 
         if not self.is_valid_move(fromSquare, moveToRight, color):
             direction = "forwardRight"
-            print("color")
             if self.computer_jump(fromSquare, moveToRight, direction, color):
                 if color == "black":
                     newMoveRight = (coordX + 2, coordY + 2)
@@ -544,24 +543,26 @@ class Board:
 
         if fromPiece.is_king:
             if color == "black":
-                if not self.is_valid_move(fromCoord, forwardLeft, color):
+                if not self.is_valid_move(fromCoord, backwardLeft, color):
                     direction = "backwardLeft"
                     if self.computer_jump(fromCoord, backwardLeft, direction, color):
                         newMoveLeft = (fromCoordX - 2, fromCoordY - 2)
                         new_moves = (fromCoord, newMoveLeft)
                         return new_moves
+                if not self.is_valid_move(fromCoord, forwardLeft, color):
                     direction = "forwardLeft"
                     if self.computer_jump(fromCoord, forwardLeft, direction, color):
                         newMoveLeft = (fromCoordX - 2, fromCoordY + 2)
                         new_moves = (fromCoord, newMoveLeft)
                         return new_moves
             else:
-                if not self.is_valid_move(fromCoord, forwardLeft, color):
+                if not self.is_valid_move(fromCoord, backwardLeft, color):
                     direction = "backwardLeft"
                     if self.computer_jump(fromCoord, backwardLeft, direction, color):
                         newMoveLeft = (fromCoordX - 2, fromCoordY + 2)
                         new_moves = (fromCoord, newMoveLeft)
                         return new_moves
+                if not self.is_valid_move(fromCoord, forwardLeft, color):
                     direction = "forwardLeft"
                     if self.computer_jump(fromCoord, forwardLeft, direction, color):
                         newMoveLeft = (fromCoordX - 2, fromCoordY - 2)
@@ -570,24 +571,26 @@ class Board:
 
         if fromPiece.is_king:
             if color == "black":
-                if not self.is_valid_move(fromCoord, forwardRight, color):
+                if not self.is_valid_move(fromCoord, backwardRight, color):
                     direction = "backwardRight"
                     if self.computer_jump(fromCoord, backwardRight, direction, color):
                         newMoveRight = (fromCoordX + 2, fromCoordY - 2)
                         new_moves = (fromCoord, newMoveRight)
                         return new_moves
+                if not self.is_valid_move(fromCoord, forwardRight, color):
                     direction = "forwardRight"
                     if self.computer_jump(fromCoord, forwardRight, direction, color):
                         newMoveRight = (fromCoordX + 2, fromCoordY + 2)
                         new_moves = (fromCoord, newMoveRight)
                         return new_moves
             else:
-                if not self.is_valid_move(fromCoord, forwardRight, color):
+                if not self.is_valid_move(fromCoord, backwardRight, color):
                     direction = "backwardRight"
                     if self.computer_jump(fromCoord, backwardRight, direction, color):
                         newMoveRight = (fromCoordX + 2, fromCoordY +2)
                         new_moves = (fromCoord, newMoveRight)
                         return new_moves
+                if not self.is_valid_move(fromCoord, forwardRight, color):
                     direction = "forwardRight"
                     if self.computer_jump(fromCoord, forwardRight, direction, color):
                         newMoveRight = (fromCoordX + 2, fromCoordY - 2)
