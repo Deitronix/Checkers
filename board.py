@@ -5,6 +5,7 @@ human and computer moving, jump pieces, kinging piece, and win conditions.
 from pygame.examples import scrap_clipboard
 
 from piece import Piece
+
 import pygame
 from collections import namedtuple
 
@@ -245,6 +246,38 @@ class Board:
 
         return False
 
+
+    def check_for_human_jumps(self, coord2):
+        fromCoord = self.numberToCoordinates[coord2]
+        fromPiece = self.locations.get(fromCoord, None)
+        print("Coordinate 2 is ")
+        print(coord2)
+        if fromPiece.is_white:
+            color = "white"
+        else:
+            color = "black"
+        valid_moves = self.find_valid_moves(fromPiece, color)
+        (move, jump) = valid_moves
+        print("jump is ")
+        print(jump)
+
+        if jump:
+            [((fromCoordX, fromCoordY), (toCoordX, toCoordY))] = jump
+            if toCoordX < 0 or toCoordX > 7 or toCoordY < 0 or toCoordY > 7:
+                self.jumpFlag = 0
+                return False
+            elif jump:
+                '''if fromPiece.is_white and toCoordY ==0:#if it is made a king, stop jumping.
+                    self.jumpFlag = 0
+                    return False
+                elif not fromPiece.is_white and toCoordY == 7:
+                    self.jumpFlag = 0
+                    return False'''
+                self.jumpFlag = 0
+                return True
+        self.jumpFlag = 0
+        return False
+
     def find_human_jumps(self, player_is_white):
         if player_is_white:
             color = "white"
@@ -257,6 +290,7 @@ class Board:
                 valid_moves = self.find_valid_moves(piece, color)
                 (move, jump) = valid_moves
                 if jump:
+
                     self.jumpFlag = 0
                     return True
         else:
@@ -293,19 +327,6 @@ class Board:
                 return False
         else:
             return False
-
-
-    def human_double(self, coord1, coord2, coord3, player_is_white):
-
-        fromCoord = self.numberToCoordinates[coord1]
-        fromPiece = self.locations.get(fromCoord, None)
-        (coordX, coordY) = fromCoord
-
-        if self.is_jump(coord1, coord2, player_is_white) and self.is_jump(coord2, coord3, player_is_white):
-                self.human_controller(coord1, coord2, player_is_white)
-                self.human_controller(coord2, coord3, player_is_white)
-        else:
-            raise Exception ("Invalid double move")
 
 #####################################################################################################################
 
@@ -368,8 +389,6 @@ class Board:
                 else:
                     newMoveLeft = (coordX - 2, coordY + 2)
                     valid_jump_moves.append((fromSquare, newMoveLeft))
-            else:
-                print("i do nothing")
         elif piece.is_king and self.is_valid_move(fromSquare, moveBackLeft, color):
             valid_moves.append((fromSquare, moveBackLeft))
 
@@ -382,8 +401,6 @@ class Board:
                 else:
                     newMoveRight = (coordX + 2, coordY + 2)
                     valid_jump_moves.append((fromSquare, newMoveRight))
-            else:
-                print("i do nothing")
         elif piece.is_king and self.is_valid_move(fromSquare, moveBackRight, color):
             valid_moves.append((fromSquare, moveBackRight))
 
@@ -396,14 +413,14 @@ class Board:
                 else:
                     newMoveLeft = (coordX - 2, coordY - 2)
                     valid_jump_moves.append((fromSquare, newMoveLeft))
-            #else:
-            #    print("i do nothing")
+
         #single move
         else:
              valid_moves.append((fromSquare, moveToLeft))
 
         if not self.is_valid_move(fromSquare, moveToRight, color):
             direction = "forwardRight"
+            print("color")
             if self.computer_jump(fromSquare, moveToRight, direction, color):
                 if color == "black":
                     newMoveRight = (coordX + 2, coordY + 2)
@@ -411,8 +428,7 @@ class Board:
                 else:
                     newMoveRight = (coordX + 2, coordY - 2)
                     valid_jump_moves.append((fromSquare, newMoveRight))
-            #else:
-             #   print("i do nothing")
+
         #single move
         else:
              valid_moves.append((fromSquare, moveToRight))
