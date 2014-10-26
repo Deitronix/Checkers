@@ -4,7 +4,8 @@ their turn or the computers
 '''
 
 import sys, pygame, threading
-from board import Board
+from newBoard import Board
+#from board import Board
 #from multiprocessing import Process
 
 class Gui():
@@ -194,9 +195,11 @@ class Gui():
                 self.screen.blit(self.cpu_play, (self.bwidth, 0))
                 computer_played = False
                 if self.player_is_white:
-                    computer_played = self.board.computerMove("black")
+                    computer_played = self.board.computer_turn("black")
+                    #computer_played = self.board.computerMove("black")
                 else:
-                    computer_played = self.board.computerMove("white")
+                    computer_played = self.board.computer_turn("white")
+                    #computer_played = self.board.computerMove("white")
                 if not computer_played:
                     # IF CPU HAS NO MOVES
                     self.screen.blit(self.human_win, (0,0))
