@@ -307,6 +307,7 @@ class Board:
         toCoord = self.numberToCoordinates[coord_b]
 
         if player_is_white:
+
             if(toCoord[0] == fromCoord[0] + 2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]-2:#forward, right or forward left
                 return True
             elif fromPiece.is_king and ((toCoord[0] == fromCoord[0] + 2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]+2):#backward right, left for kings
@@ -315,6 +316,7 @@ class Board:
             else:
                 return False
         elif not player_is_white:
+
             if(toCoord[0] == fromCoord[0] + 2 or toCoord[0] == fromCoord[0] - 2) and toCoord[1] == fromCoord[1]+2:#forward right or left
                 return True
             elif fromPiece.is_king and ((toCoord[0] == fromCoord[0] + 2 or toCoord[0] ==fromCoord[0] - 2) and toCoord[1] == fromCoord[1]-2):#backwards right, left

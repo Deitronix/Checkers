@@ -3,40 +3,59 @@ import pygame
 from collections import namedtuple
 import copy
 from board import Board
+import random
+
+best_score = 100000
+worst_score = -100000
+MAX_DEPTH = 6
 
 def dfs_game_tree_rec(current_state, level, color):
 
-    #if level is greater than a max of 6, end the recursive call
-    if level >= 4:
+    if level == 0:
+        (black_pieces, white_pieces, location) = current_state
+    else:
         ((next_move),(black_pieces, white_pieces, location)) = current_state
+
+    #will probably use these for the eval function
+    if level%2 == 0 and color == "white":
+        my_pieces = white_pieces
+        opponent_pieces = black_pieces
+    elif level%2 == 0 and color == "black":
+        my_pieces = black_pieces
+        opponent_pieces = white_pieces
+    if level%2 == 1 and color == "white":
+        my_pieces = black_pieces
+        opponent_pieces = white_pieces
+    elif level%2 == 1 and color == "black":
+        my_pieces = white_pieces
+        opponent_pieces = black_pieces
+
+
+    #if level is greater than a max of 6, end the recursive call
+    if level >= MAX_DEPTH:
         current_kings = 0
         #figure out current number of kings for evaluator
-        for piece in black_pieces:
-            if piece.is_king:
-                current_kings += 1
-        for piece in white_pieces:
+        for piece in my_pieces:
             if piece.is_king:
                 current_kings += 1
         #if there is a jump, take it and stop looking at other options
         if check_jump(next_move):
             current_state = ((next_move),(black_pieces, white_pieces, location))
-            return (next_move, evaluate_board(current_state, current_kings, color))
+            return (next_move, evaluate_board(current_state, current_kings, color, level))
         else:
             current_state = ((next_move),(black_pieces, white_pieces, location))
-            return (next_move, evaluate_board(current_state, current_kings, color))
+            return (next_move, evaluate_board(current_state, current_kings, color, level))
 
     else:
         #if the level is greater than 0, check to see if there is a jump
         #if so just return the jump move as soon as possible
         if level > 0:
-            #current state now has a move associated with it
-            ((next_move),(black_pieces, white_pieces, location)) = current_state
             current_state = (black_pieces, white_pieces, location)
             current_kings = 0
 
             if check_jump(next_move):
                 current_state = ((next_move),(black_pieces, white_pieces, location))
-                return (next_move, evaluate_board(current_state, current_kings, color))
+                return (next_move, evaluate_board(current_state, current_kings, color, level))
 
         #next state is a node of the tree
         next_states = get_next_states(current_state, color)
@@ -46,12 +65,14 @@ def dfs_game_tree_rec(current_state, level, color):
             #returns min value choice
             #also ensures to pass back the "parent" current state and not the child's current state
             #return min((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
-            (min_next_move, (_, score)) = min(((n, dfs_game_tree_rec(n, level+1, "white")) for n in next_states), key = lambda tpl: tpl[1][1])
+            (min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, "white")) for n in next_states), key = lambda tpl: tpl[1][1])
             return (min_next_move, score)
         else:
             #returns max value choice
             #return max((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
-            (max_next_move, (_, score)) = max(((n, dfs_game_tree_rec(n, level+1, "black")) for n in next_states), key = lambda tpl: tpl[1][1])
+            max_score = []
+
+            (max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, "black")) for n in next_states), key = lambda tpl: tpl[1][1])
 
             return (max_next_move, score)
 
@@ -68,52 +89,78 @@ def switch_color(color):
     elif color == "white":
         return "black"
 
+#if a max value has the same score, randomize which one it picks
+def my_max(seq, key=lambda a:a):
+    seq = iter(seq)
+    max_val = None
+    max_acc = None
+    try:
+        v = next(seq)
+        max_val = key(v)
+        max_acc = [v]
+    except StopIteration:
+        raise Exception( 'Calling max with empty sequence' )
+    for v in seq:
+        comp = key(v)
+        if comp > max_val:
+            max_val = comp
+            max_acc = [v]
+        elif comp == max_val:
+            max_acc.append(v)
+    return random.choice(max_acc)
+
+#if a min value has the same score, randomize which one it picks
+def my_min(seq, key=lambda a:a):
+    seq = iter(seq)
+    min_val = None
+    min_acc = None
+    try:
+        v = next(seq)
+        min_val = key(v)
+        min_acc = [v]
+    except StopIteration:
+        raise Exception( 'Calling min with empty sequence' )
+    for v in seq:
+        comp = key(v)
+        if comp > min_val:
+            min_val = comp
+            min_acc = [v]
+        elif comp == min_val:
+            min_acc.append(v)
+    return random.choice(min_acc)
+
 #def evaluate_board(current_state, color):
-def evaluate_board(current_state, current_kings, color):
+def evaluate_board(current_state, current_kings, color, level):
     ((fromCoord, toCoord), (black_pieces, white_pieces, location)) = current_state
     (fromCoordX, fromCoordY) = fromCoord
     (toCoordX, toCoordY) = toCoord
+
+
+
 
     valued_squares = ((2, 1), (4,1), (3, 2), (5, 2), (2, 3), (4, 3),
                 (3, 4), (5, 4), (2, 5), (4, 5), (3, 6), (5, 6))
 
     value = 0
-    if color == "black":
-        if (len(black_pieces) - len(white_pieces)) > (len(white_pieces) - len(black_pieces)):
-            value = value + 4
-        black_king_count = 0
-        for piece in black_pieces:
-            if piece.is_king:
-               black_king_count += 1
-        if current_kings < black_king_count:
-            value += 3
+    #if (len(my_pieces) - len(opponent_pieces)) > (len(my_pieces) - len(opponent_pieces)):
+        #value = value + 4
 
-        if (location in valued_squares):
-            value += 2
-        #if len(white_pieces) + len(black_pieces) = 10
-        # add distance into consideration value += 2;
-        if check_jump((fromCoord,toCoord)):
-            value += 20
-        else:
-            value = value + 1
-    if color == "white":
-        if (len(white_pieces) - len(black_pieces)) > (len(black_pieces) - len(white_pieces)):
-            value = value + 4
-        white_king_count = 0
-        for piece in black_pieces:
-            if piece.is_king:
-               white_king_count += 1
-        if current_kings < white_king_count:
-            value += 3
+    my_king_count = 0
+    #for piece in my_pieces:
+        #if piece.is_king:
+            #my_king_count += 1
+    #if current_kings < my_king_count:
+        #value += 3
 
-        if (location in valued_squares):
-            value += 2
-        #if len(white_pieces) + len(black_pieces) = 10
-        # add distance into consideration value += 2;
-        if check_jump((fromCoord,toCoord)):
-            value += 20
-        else:
-            value = value + 1
+    if (location in valued_squares):
+        value += 2
+    #if len(white_pieces) + len(black_pieces) = 10
+    # add distance into consideration value += 2;
+    if check_jump((fromCoord,toCoord)):
+        value += 20
+    else:
+        value = value + 1
+
     return value
 
 
