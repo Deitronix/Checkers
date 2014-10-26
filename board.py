@@ -334,7 +334,7 @@ class Board:
         possible_moves = self.find_next_states(color)
     # Choose a move somehow... for now you can probably do:
         if possible_moves:
-            next_move = possible_moves[ 0 ]
+            next_move = possible_moves[0]
             self.make_move_computer(next_move)
             return True
         else:
@@ -420,7 +420,6 @@ class Board:
 
         if not self.is_valid_move(fromSquare, moveToRight, color):
             direction = "forwardRight"
-            print("color")
             if self.computer_jump(fromSquare, moveToRight, direction, color):
                 if color == "black":
                     newMoveRight = (coordX + 2, coordY + 2)
