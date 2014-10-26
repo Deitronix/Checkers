@@ -7,7 +7,7 @@ from board import Board
 def dfs_game_tree_rec(current_state, level, color):
 
     #if level is greater than a max of 6, end the recursive call
-    if level >= 6:
+    if level >= 4:
         ((next_move),(black_pieces, white_pieces, location)) = current_state
         current_kings = 0
         #figure out current number of kings for evaluator
@@ -47,6 +47,7 @@ def dfs_game_tree_rec(current_state, level, color):
             #also ensures to pass back the "parent" current state and not the child's current state
             #return min((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
             (min_next_move, (_, score)) = min(((n, dfs_game_tree_rec(n, level+1, "white")) for n in next_states), key = lambda tpl: tpl[1][1])
+            return (min_next_move, score)
         else:
             #returns max value choice
             #return max((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
