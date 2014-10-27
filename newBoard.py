@@ -81,16 +81,14 @@ class Board:
                     piece.draw()
                 self.screen.blit(self.star, (0, 0))
 
-
-
-
 #####################################################################################################################
+
     def human_controller(self, fromSquare, toSquare, player_is_white):
         fromCoord = self.numberToCoordinates[fromSquare]
         toCoord = self.numberToCoordinates[toSquare]
         fromPiece = self.locations.get(fromCoord, None)
         toPiece = self.locations.get(toCoord, None)
-
+        fromPiece.is_new_king = False
         if not self.validate_input(fromPiece, player_is_white):
            raise Exception ("Sorry, that is not a valid move")
         else:
@@ -223,6 +221,7 @@ class Board:
                 self.white_pieces.remove(jumpedPiece)
         else:
             print("not a valid jump")
+
     def check_for_human_moves(self, player_is_white):
         if player_is_white:
             color = "white"
@@ -270,6 +269,11 @@ class Board:
                 elif not fromPiece.is_white and toCoordY == 7:
                     self.jumpFlag = 0
                     return False'''
+                if fromPiece.is_new_king:
+                    fromPiece.is_new_king = False
+                    self.jumpFlag = 0
+                    return False
+
                 self.jumpFlag = 0
                 return True
         self.jumpFlag = 0
@@ -697,11 +701,16 @@ class Board:
 
         if fromPiece.is_white:
             if CoordY == 0:
+                if not fromPiece.is_king:
+                    fromPiece.is_new_king = True
                 fromPiece.make_king()
+
             else:
                 return
         else:
             if CoordY == 7:
+                if not fromPiece.is_king:
+                    fromPiece.is_new_king = True
                 fromPiece.make_king()
             else:
                 return

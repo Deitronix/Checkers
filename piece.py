@@ -12,6 +12,7 @@ class Piece:
         self.screen = screen
         self.is_king = False
         self.is_white = is_white
+        self.is_new_king = False
         self.pos = pos
         self.width = width
         self.height = height
