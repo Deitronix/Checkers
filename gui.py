@@ -62,7 +62,7 @@ class Gui():
         self.show_numbers = False
         self.piece_is_selected = False
         self.selected_number = 0
-
+        self.top_display = 0
         self.playing = False
 
 
@@ -70,7 +70,7 @@ class Gui():
         if text != "":
             self.text_display.append(text)
             if(len(self.text_display)>self.max_display - 1):
-                del self.text_display[0]
+                self.top_display += 1
 
     def collide(self, piece_pos, mouse_pos):
         """Rough method to check if the mouses position is in for a piece"""
@@ -145,6 +145,15 @@ class Gui():
                         if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
                             self.typing_text = self.typing_text[:-1]
                             self.typing_text = self.typing_text[:-1]
+
+                        if pygame.key.get_pressed()[pygame.K_UP]:
+                            self.top_display -= 1
+                            if self.top_display < 0:
+                                self.top_display = 0
+                        if pygame.key.get_pressed()[pygame.K_DOWN]:
+                            if self.top_display < len(self.text_display) - 1:
+                                self.top_display += 1
+
                 self.board.draw(self.inmenu)
 
 
@@ -181,15 +190,17 @@ class Gui():
                     text_offset += direction
                     if text_offset<0 or text_offset>2*ratio_speed/3:
                         direction *= -1
-
-                    while i < self.max_display - 1 and i < len(self.text_display):
+                    i = self.top_display
+                    current_d = 0
+                    while current_d < self.max_display - 1 and i < len(self.text_display):
                         text = fnt.render("> " + self.text_display[i], 1, (0, 0, 0))
                         speed = 0
                         if text.get_width() > self.pwidth: # if text is too big
                             speed = text.get_width()/ratio_speed # get its speed ratio
-                        self.screen.blit(text, (self.bwidth, i*self.theight + self.pheight),
+                        self.screen.blit(text, (self.bwidth, current_d*self.theight + self.pheight),
                                          (speed*text_offset, 0, self.twidth, self.theight))
                         i += 1
+                        current_d += 1
                 pygame.display.flip()
             else:
                 self.screen.blit(self.cpu_play, (self.bwidth, 0))
