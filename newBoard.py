@@ -11,6 +11,7 @@ import copy
 
 class Board:
     jumpFlag = 0 #to determine if the computer has made a jump
+    white_is_maximizer = True
     locations = dict()
     black_pieces = list()
     white_pieces = list()
@@ -329,8 +330,12 @@ class Board:
 #####################################################################################################################
 
     def computer_turn(self, color):
+        if color == "white":
+            white_is_maximizer = True
+        elif color == "black":
+            white_is_maximizer = False
         current_state = (self.black_pieces, self.white_pieces, self.locations)
-        (next_move, score) = states.dfs_game_tree_rec(current_state, 0, color)
+        (next_move, score) = states.dfs_game_tree_rec(current_state, 0, white_is_maximizer)
 
         if (next_move, score):
             self.make_move_computer(next_move)

@@ -1,50 +1,38 @@
-from piece import Piece
-import pygame
-from collections import namedtuple
+
+
 import copy
 from board import Board
 import random
+import math
 
+human_is_white = True
+max_possible_value = 1000000
+min_possible_value = -1000000
 best_score = 100000
 worst_score = -100000
-MAX_DEPTH = 6
+MAX_DEPTH = 4
 
-def dfs_game_tree_rec(current_state, level, color):
+#acts as the minimax algorithm
+def dfs_game_tree_rec(current_state, level, white_is_maximizer):
+
+    color = color_level(white_is_maximizer, level)
 
     if level == 0:
         (black_pieces, white_pieces, location) = current_state
     else:
         ((next_move),(black_pieces, white_pieces, location)) = current_state
 
-    #will probably use these for the eval function
-    if level%2 == 0 and color == "white":
-        my_pieces = white_pieces
-        opponent_pieces = black_pieces
-    elif level%2 == 0 and color == "black":
-        my_pieces = black_pieces
-        opponent_pieces = white_pieces
-    if level%2 == 1 and color == "white":
-        my_pieces = black_pieces
-        opponent_pieces = white_pieces
-    elif level%2 == 1 and color == "black":
-        my_pieces = white_pieces
-        opponent_pieces = black_pieces
-
 
     #if level is greater than a max of 6, end the recursive call
     if level >= MAX_DEPTH:
-        current_kings = 0
-        #figure out current number of kings for evaluator
-        for piece in my_pieces:
-            if piece.is_king:
-                current_kings += 1
+
         #if there is a jump, take it and stop looking at other options
         if check_jump(next_move):
             current_state = ((next_move),(black_pieces, white_pieces, location))
-            return (next_move, evaluate_board(current_state, current_kings, color, level))
+            return (next_move, evaluate_board(current_state, white_is_maximizer))
         else:
             current_state = ((next_move),(black_pieces, white_pieces, location))
-            return (next_move, evaluate_board(current_state, current_kings, color, level))
+            return (next_move, evaluate_board(current_state, white_is_maximizer))
 
     else:
         #if the level is greater than 0, check to see if there is a jump
@@ -55,26 +43,30 @@ def dfs_game_tree_rec(current_state, level, color):
 
             if check_jump(next_move):
                 current_state = ((next_move),(black_pieces, white_pieces, location))
-                return (next_move, evaluate_board(current_state, current_kings, color, level))
+                return (next_move, evaluate_board(current_state, white_is_maximizer))
 
         #next state is a node of the tree
-        next_states = get_next_states(current_state, color)
+        next_states = get_next_states(current_state, color, level)
         #depending if it's your turn or the opponents, min or max the nodes
         if is_player(level):
             #calling this method with new parameter values based off of some n in next_state
             #returns min value choice
             #also ensures to pass back the "parent" current state and not the child's current state
-            #return min((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
-            (min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, "white")) for n in next_states), key = lambda tpl: tpl[1][1])
-            return (min_next_move, score)
+            try:
+                #return min((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
+                (min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
+                return (min_next_move, score)
+            except EmptySequence:
+                return max_possible_value
         else:
             #returns max value choice
-            #return max((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
-            max_score = []
+            try:
+                #return max((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
+                (max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
 
-            (max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, "black")) for n in next_states), key = lambda tpl: tpl[1][1])
-
-            return (max_next_move, score)
+                return (max_next_move, score)
+            except EmptySequence:
+                return min_possible_value
 
 def is_player(level):
     if level%2 == 1:
@@ -82,12 +74,48 @@ def is_player(level):
     else:
         return False
 
-#thought I might need this, but appear not to
 def switch_color(color):
     if color == "black":
         return "white"
     elif color == "white":
         return "black"
+
+
+def color_level(white, level):
+
+    if white and level == 0:
+        color = "white"
+    elif white and level == 1:
+        color = "white"
+    elif white and level == 2:
+        color = "black"
+    elif white and level == 3:
+        color = "white"
+    elif white and level == 4:
+        color = "black"
+    elif white and level == 5:
+        color = "white"
+    elif white and level == 6:
+        color = "black"
+    elif not white and level == 0:
+        color = "black"
+    elif not white and level == 1:
+        color = "black"
+    elif not white and level == 2:
+        color = "white"
+    elif not white and level == 3:
+        color = "black"
+    elif not white and level == 4:
+        color = "white"
+    elif not white and level == 5:
+        color = "black"
+    elif not white and level == 6:
+        color = "white"
+
+    return color
+
+class EmptySequence( Exception ):
+    pass
 
 #if a max value has the same score, randomize which one it picks
 def my_max(seq, key=lambda a:a):
@@ -98,8 +126,9 @@ def my_max(seq, key=lambda a:a):
         v = next(seq)
         max_val = key(v)
         max_acc = [v]
+    #for the case where computer has no possible moves left
     except StopIteration:
-        raise Exception( 'Calling max with empty sequence' )
+        raise EmptySequence( 'Calling with empty sequence' )
     for v in seq:
         comp = key(v)
         if comp > max_val:
@@ -108,6 +137,7 @@ def my_max(seq, key=lambda a:a):
         elif comp == max_val:
             max_acc.append(v)
     return random.choice(max_acc)
+
 
 #if a min value has the same score, randomize which one it picks
 def my_min(seq, key=lambda a:a):
@@ -118,8 +148,9 @@ def my_min(seq, key=lambda a:a):
         v = next(seq)
         min_val = key(v)
         min_acc = [v]
+    #for the case where opponent has no more moves left
     except StopIteration:
-        raise Exception( 'Calling min with empty sequence' )
+        raise EmptySequence( 'Calling min with empty sequence' )
     for v in seq:
         comp = key(v)
         if comp > min_val:
@@ -130,40 +161,63 @@ def my_min(seq, key=lambda a:a):
     return random.choice(min_acc)
 
 #def evaluate_board(current_state, color):
-def evaluate_board(current_state, current_kings, color, level):
+def evaluate_board(current_state, white_is_maximizer):
     ((fromCoord, toCoord), (black_pieces, white_pieces, location)) = current_state
     (fromCoordX, fromCoordY) = fromCoord
     (toCoordX, toCoordY) = toCoord
+    x1 = toCoordX
+    y1 = toCoordY
 
-
-
+    if white_is_maximizer:
+        max_pieces = white_pieces
+        min_pieces = black_pieces
+    else:
+        max_pieces = black_pieces
+        min_pieces = white_pieces
 
     valued_squares = ((2, 1), (4,1), (3, 2), (5, 2), (2, 3), (4, 3),
                 (3, 4), (5, 4), (2, 5), (4, 5), (3, 6), (5, 6))
 
-    value = 0
-    #if (len(my_pieces) - len(opponent_pieces)) > (len(my_pieces) - len(opponent_pieces)):
-        #value = value + 4
+    #sq_value = 0
+    #if location in valued_squares:
+    #    sq_value += 2
 
-    my_king_count = 0
-    #for piece in my_pieces:
-        #if piece.is_king:
-            #my_king_count += 1
-    #if current_kings < my_king_count:
-        #value += 3
+    max_kings = num_kings(max_pieces)
+    min_kings = num_kings(min_pieces)
 
-    if (location in valued_squares):
-        value += 2
-    #if len(white_pieces) + len(black_pieces) = 10
-    # add distance into consideration value += 2;
-    if check_jump((fromCoord,toCoord)):
-        value += 20
-    else:
-        value = value + 1
+    #jump = 0
+    #if len(max_pieces) - len(min_pieces) == 0:
+        #jump = 0
+    #else:
+        #jump = 15
+    #my_distance = 0
+    #if len(max_pieces) <= 6  and len(min_pieces) >= 6:
+    #    for piece2 in min_pieces:
+    #        (x2, y2) = piece2.pos
+    #        distance = math.sqrt((x2-x1)**2+(y2-y1)**2)
+    #        if distance < 2.0:
+    #            my_distance -= 10
+    #elif len(max_pieces) <= 2 and len(min_pieces) >=2:
+    #    for piece2 in min_pieces:
+    #        (x2, y2) = piece2.pos
+    #        distance = math.sqrt((x2-x1)**2+(y2-y1)**2)
+    #        if distance < 2:
+    #            my_distance -= 20
 
+
+    max_value = (len(max_pieces) + max_kings)
+    #adding -1 is not the correct solution. Im just too tired to figure out what's going on atm
+    min_value = (len(min_pieces)-1 + min_kings)
+
+    value = (max_value - min_value)
     return value
 
-
+def num_kings(pieces):
+    my_king = 0
+    for king in pieces:
+        if king.is_king:
+            my_king += 1
+    return my_king
 
 def copy_board(current_state):
     (black_pieces, white_pieces, locations) = current_state
@@ -175,8 +229,9 @@ def copy_board(current_state):
 
     return copied_current_state
 
-def get_next_states(current_state, color):
+def get_next_states(current_state, color, level):
     #(location, black_pieces, white_pieces) = current_state
+
     new_states = []
     moves = valid_moves(current_state, color)
     for m in moves:
@@ -202,6 +257,7 @@ def valid_moves(current_state, color):
     #find all valid moves based off of current state passed through
     (black_pieces, white_pieces, location) = current_state
     next_moves = []
+
 
     if color == "black":
         for piece in black_pieces:
