@@ -9,7 +9,7 @@ from newBoard import Board
 #from multiprocessing import Process
 
 class Gui():
-    """Thread responsible for all gui updates, including inputs - keyboard and move -"""
+    """Main class responsible for all gui updates, including inputs - keyboard and move -"""
 
     def __init__(self):
         pygame.init()
@@ -269,6 +269,4 @@ class Gui():
         pygame.display.flip()
 if __name__ == '__main__':
     gui = Gui()
-    #Synchronize with inside comps
     gui.show()
-    input()

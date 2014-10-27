@@ -2,7 +2,6 @@
 Board.py - this file creates a representation of a game board and embodies all the game logic including
 human and computer moving, jump pieces, kinging piece, and win conditions.
 '''
-from pygame.examples import scrap_clipboard
 
 from piece import Piece
 
