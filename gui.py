@@ -48,7 +48,7 @@ class Gui():
         self.text_display.append("Enter your moves")
 
         # --GET VARS FROM MAIN --
-        self.board = Board(self.screen, self.bwidth,self. bheight)
+        self.board = Board(self.screen, self.bwidth,self. bheight, self)
         self.black_pieces = list()
         self.white_pieces = list()
 
@@ -194,6 +194,7 @@ class Gui():
             else:
                 self.screen.blit(self.cpu_play, (self.bwidth, 0))
                 computer_played = False
+
                 if self.player_is_white:
                     computer_played = self.board.computer_turn("black")
                     #computer_played = self.board.computerMove("black")
