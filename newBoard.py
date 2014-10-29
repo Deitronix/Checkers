@@ -27,10 +27,11 @@ class Board:
                            29: (0,7), 30: (2, 7), 31: (4, 7), 32: (6, 7)}
 
 
-    def __init__(self, screen, width, height):
+    def __init__(self, screen, width, height, gui):
         self.screen = screen
         self.width = width
         self.height = height
+        self.gui = gui
 
 
         self.boardimg = pygame.image.load(self.img_folder+"board.png")
@@ -362,7 +363,9 @@ class Board:
         # -- Display computer move ---
         fromSq = fromCoordY * 4 + fromCoordX//2 + 1
         toSq = toCoordY * 4 + toCoordX//2 + 1
+        info = "Computer move: {} - {}".format(fromSq, toSq)
         print("Computer move: {} - {}".format(fromSq, toSq))
+        self.gui.display("Computer move: {} - {}".format(fromSq, toSq))
 
         if fromCoordY - toCoordY == 2 or fromCoordY + toCoordY == 2 or fromCoordY - toCoordY == -2 or fromCoordY + toCoordY == -2:
             self.jumpFlag = 1

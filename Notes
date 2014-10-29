@@ -1,3 +1,9 @@
  - Undo moves
  - Avaiable moves list
  - ANIMATIONS
+ - inflate rects
+- offset piece
+- wsize + sep?
+
+define top, left - board/console/playboard
+define offset
