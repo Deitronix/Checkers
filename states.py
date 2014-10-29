@@ -183,7 +183,7 @@ def evaluate_board(current_state, white_is_maximizer):
         min_pieces = white_pieces
 
     valued_squares = ((2, 1), (4,1), (3, 2), (5, 2), (2, 3), (4, 3),
-                (3, 4), (5, 4), (2, 5), (4, 5), (3, 6), (5, 6))
+                     (3, 4), (5, 4), (2, 5), (4, 5), (3, 6), (5, 6))
 
     max_sq_value = 0
     min_sq_value = 0
