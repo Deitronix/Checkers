@@ -5,9 +5,12 @@ from board import Board
 import random
 import math
 
-computer_is_white = True
-max_possible_value = (100001, 10000)
-min_possible_value = (-100000, -100001)
+max_possible_value = (100001, 0)
+min_possible_value = (-100001, -100000)
+
+min_score = -100000
+max_score = 100000
+
 
 MAX_DEPTH = 4
 
@@ -57,19 +60,19 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
             #returns min value choice
             #also ensures to pass back the "parent" current state and not the child's current state
             try:
-                print ("in min", color, level)
+
                 #return min((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
                 (min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
+
                 return (min_next_move, score)
             except EmptySequence:
                 return max_possible_value
         else:
             #returns max value choice
             try:
-                print ("in max", color, level)
+
                 #return max((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
                 (max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
-
 
                 return (max_next_move, score)
             except EmptySequence:
@@ -182,53 +185,96 @@ def evaluate_board(current_state, white_is_maximizer):
         max_pieces = black_pieces
         min_pieces = white_pieces
 
-    valued_squares = ((2, 1), (4,1), (3, 2), (5, 2), (2, 3), (4, 3),
-                (3, 4), (5, 4), (2, 5), (4, 5), (3, 6), (5, 6))
+    if not max_pieces:
+        return min_score
+    elif not min_pieces:
+        return max_score
+
+    max_valued_squares = ((3,2), (3,4), (5, 2), (5, 4), (2, 3), (4, 3),
+                (2, 5), (4, 5))
+    somewhat_valued_squares = ((1,2), (1,4), (1,6), (2,1), (3,6), (4,1), (5,6), (6,1), (6,3), (6,5))
 
     max_sq_value = 0
     min_sq_value = 0
-    for piece in max_pieces:
+    '''for piece in max_pieces:
         (x, y) = piece._get_pos()
-        if (x,y) in valued_squares:
+        if (x,y) in max_valued_squares and len(max_pieces) > len(min_pieces):
             max_sq_value += 5
-        else:
-            max_sq_value -= 5
+
     for piece in min_pieces:
         (x, y) = piece._get_pos()
-        if min_pieces in valued_squares:
-            min_sq_value -= 5
-        else:
+        if min_pieces in max_valued_squares and len(min_pieces) > len(max_pieces):
             min_sq_value += 5
+
+    for piece in max_pieces:
+        (x,y) = piece._get_pos()
+        if (x,y) in somewhat_valued_squares and len(max_pieces) > len(min_pieces):
+            max_sq_value += 3
+    for piece in min_pieces:
+        (x,y) = piece._get_pos()
+        if(x,y) in somewhat_valued_squares and len(min_pieces)< len(max_pieces):
+            min_sq_value += 3'''
+
 
     max_kings = num_kings(max_pieces)
     min_kings = num_kings(min_pieces)
 
-    #jump = 0
-    #if len(max_pieces) - len(min_pieces) == 0:
-        #jump = 0
-    #else:
-        #jump = 15
+    '''max_piece_value = 0
+    min_piece_value = 0
+    if len(max_pieces) > len(min_pieces)-1:
+        max_piece_value = 40
+        min_piece_value = -5
+    elif len(min_pieces)-1 > len(max_pieces):
+        max_piece_value = -40
+        min_piece_value = 5
+    else:
+        max_piece_value = 1
+        min_piece_value = 1
+    '''
+
+    single_max_pv = len(max_pieces) - len(min_pieces)
+    single_min_pv = len(min_pieces) - len(max_pieces)
+
+    max_almost_king = 0
+    min_almost_king = 0
+    #if len(max_pieces) <= 8 and len(max_pieces) >= 4:
+    for piece in max_pieces:
+        if piece.is_king:
+            continue
+        max_almost_king +=  distance_to_king(piece)
+    for piece in min_pieces:
+        if piece.is_king:
+            continue
+        min_almost_king += distance_to_king(piece)
+
     #my_distance = 0
     #if len(max_pieces) <= 6  and len(min_pieces) >= 6:
     #    for piece2 in min_pieces:
     #        (x2, y2) = piece2.pos
     #        distance = math.sqrt((x2-x1)**2+(y2-y1)**2)
     #        if distance < 2.0:
-    #            my_distance -= 10
+    #            my_distance -= 20
+
     #elif len(max_pieces) <= 2 and len(min_pieces) >=2:
     #    for piece2 in min_pieces:
     #        (x2, y2) = piece2.pos
     #        distance = math.sqrt((x2-x1)**2+(y2-y1)**2)
     #        if distance < 2:
-    #            my_distance -= 20
+    #            my_distance -= 40
 
 
-    max_value = (len(max_pieces) + max_kings + max_sq_value)
-    min_value = (len(min_pieces) + min_kings + min_sq_value)
+    #safe = is_move_safe((fromCoord, toCoordY),max_pieces, min_pieces)
+
+    #max_value = (max_piece_value + max_kings + max_sq_value + max_almost_king)
+    #min_value = (min_piece_value + min_kings + min_sq_value + min_almost_king)
+
+    max_value = (single_max_pv + max_kings)
+    min_value = (single_min_pv + min_kings)
 
     value = (max_value - min_value)
-    print(value)
+
     return value
+
 
 def num_kings(pieces):
     my_king = 0
@@ -236,6 +282,37 @@ def num_kings(pieces):
         if king.is_king:
             my_king += 1
     return my_king
+
+def distance_to_king(piece):
+    game_color = piece.get_color()
+    (x,y) = piece._get_pos()
+
+    distance = 7 - y
+    almost_king = 0
+    if game_color == "black":
+
+        if distance > 6:
+            almost_king = 1
+        elif distance <=6 and distance > 4:
+            almost_king =5
+        elif distance <=4 and distance > 2:
+            almost_king = 10
+        elif distance <=2 and distance >=1:
+            almost_king = 15
+        elif distance == 0:
+            almost_king = 30
+    else:
+
+        if distance <=1 and distance > 2:
+            almost_king = 1
+        elif distance <=2 and distance >4:
+            almost_king = 5
+        elif distance <=4 and distance >6:
+            almost_king = 15
+        elif distance == 7:
+            almost_king = 30
+
+    return almost_king
 
 def copy_board(current_state):
     (black_pieces, white_pieces, locations) = current_state
@@ -349,25 +426,25 @@ def apply_move (move, copied_current_state):
             white_pieces.remove(jumpedPiece)
             del location[fromCoordX+1, fromCoordY+1]
         #will allow to update for single moves
-        if Board.jumpFlag == 1:
-            Board.jumpFlag = 0
-            del location[fromCoord]
-            fromPiece._set_pos(toCoord)
+    if Board.jumpFlag == 1:
+        Board.jumpFlag = 0
+        del location[fromCoord]
+        fromPiece._set_pos(toCoord)
 
-            if not fromPiece.is_king:
-                check_king(fromPiece, toCoordY)
-                if fromPiece.is_king:
-                    return ((fromCoord, toCoord), copied_current_state)
-
-            next_moves = multiple_jump(copied_current_state, toCoord, fromPiece)
-            if next_moves:
-            #is not None:
-                apply_move(next_moves, copied_current_state)
-        else:
-
-            del location[fromCoord]
-            fromPiece._set_pos(toCoord)
+        if not fromPiece.is_king:
             check_king(fromPiece, toCoordY)
+            if fromPiece.is_king:
+                return ((fromCoord, toCoord), copied_current_state)
+
+        next_moves = multiple_jump(copied_current_state, toCoord, fromPiece)
+        if next_moves:
+        #is not None:
+           apply_move(next_moves, copied_current_state)
+    else:
+
+        del location[fromCoord]
+        fromPiece._set_pos(toCoord)
+        check_king(fromPiece, toCoordY)
 
     return ((fromCoord, toCoord), copied_current_state)
 

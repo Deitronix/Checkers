@@ -342,6 +342,8 @@ class Board:
         current_state = (self.black_pieces, self.white_pieces, self.locations)
         (next_move, score) = states.dfs_game_tree_rec(current_state, 0, white_is_maximizer)
 
+        print(score, "I am inside of newboard")
+
         if (next_move, score):
             self.make_move_computer(next_move)
             return True
