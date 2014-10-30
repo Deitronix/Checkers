@@ -12,7 +12,7 @@ min_score = -100000
 max_score = 100000
 
 
-MAX_DEPTH = 4
+MAX_DEPTH = 5
 
 #acts as the minimax algorithm
 def dfs_game_tree_rec(current_state, level, white_is_maximizer):
@@ -46,11 +46,10 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
         #if so just return the jump move as soon as possible
         if level > 0:
             current_state = (black_pieces, white_pieces, location)
-            current_kings = 0
 
-            if check_jump(next_move):
-                current_state = ((next_move),(black_pieces, white_pieces, location))
-                return (next_move, evaluate_board(current_state, white_is_maximizer))
+            #if check_jump(next_move):
+            #    current_state = ((next_move),(black_pieces, white_pieces, location))
+            #    return (next_move, evaluate_board(current_state, white_is_maximizer))
 
         #next state is a node of the tree
         next_states = get_next_states(current_state, color, level)
@@ -96,31 +95,31 @@ def color_level(white, level):
     if white and level == 0:
         color = "white"
     elif white and level == 1:
-        color = "white"
+        color = "black"
     elif white and level == 2:
-        color = "black"
+        color = "white"
     elif white and level == 3:
-        color = "white"
+        color = "black"
     elif white and level == 4:
-        color = "black"
-    elif white and level == 5:
         color = "white"
-    elif white and level == 6:
+    elif white and level == 5:
         color = "black"
+    elif white and level == 6:
+        color = "white"
     elif not white and level == 0:
         color = "black"
     elif not white and level == 1:
-        color = "black"
+        color = "white"
     elif not white and level == 2:
-        color = "white"
+        color = "black"
     elif not white and level == 3:
-        color = "black"
+        color = "white"
     elif not white and level == 4:
-        color = "white"
-    elif not white and level == 5:
         color = "black"
-    elif not white and level == 6:
+    elif not white and level == 5:
         color = "white"
+    elif not white and level == 6:
+        color = "black"
 
     return color
 
@@ -232,10 +231,7 @@ def evaluate_board(current_state, white_is_maximizer):
         min_piece_value = 1
     '''
 
-    single_max_pv = len(max_pieces) - len(min_pieces)
-    single_min_pv = len(min_pieces) - len(max_pieces)
-
-    max_almost_king = 0
+    '''max_almost_king = 0
     min_almost_king = 0
     #if len(max_pieces) <= 8 and len(max_pieces) >= 4:
     for piece in max_pieces:
@@ -245,7 +241,7 @@ def evaluate_board(current_state, white_is_maximizer):
     for piece in min_pieces:
         if piece.is_king:
             continue
-        min_almost_king += distance_to_king(piece)
+        min_almost_king += distance_to_king(piece)'''
 
     #my_distance = 0
     #if len(max_pieces) <= 6  and len(min_pieces) >= 6:
@@ -268,10 +264,11 @@ def evaluate_board(current_state, white_is_maximizer):
     #max_value = (max_piece_value + max_kings + max_sq_value + max_almost_king)
     #min_value = (min_piece_value + min_kings + min_sq_value + min_almost_king)
 
-    max_value = (single_max_pv + max_kings)
-    min_value = (single_min_pv + min_kings)
+    max_value = 100 * (len(max_pieces)*3 + max_kings*5)
+    min_value = 100 * (len(min_pieces)*3 + min_kings*5)
 
     value = (max_value - min_value)
+#    print("max value ", max_value, "min value ", min_value, "value ", value)
 
     return value
 
