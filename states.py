@@ -193,6 +193,7 @@ def evaluate_board(current_state, white_is_maximizer):
                 (2, 5), (4, 5))
     somewhat_valued_squares = ((1,2), (1,4), (1,6), (2,1), (3,6), (4,1), (5,6), (6,1), (6,3), (6,5))
 
+
     max_sq_value = 0
     min_sq_value = 0
     '''for piece in max_pieces:
