@@ -4,13 +4,15 @@ import copy
 from board import Board
 import random
 import math
+import pdb
 
 max_possible_value = (100001, 0)
 min_possible_value = (-100001, -100000)
 
 min_score = -100000
 max_score = 100000
-
+max_alpha = 100000000000
+min_beta = -100000000000
 
 MAX_DEPTH = 5
 
@@ -29,7 +31,6 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
     else:
         ((next_move),(black_pieces, white_pieces, location)) = current_state
 
-
     #if level is greater than a max of 6, end the recursive call
     if level >= MAX_DEPTH:
 
@@ -47,10 +48,6 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
         if level > 0:
             current_state = (black_pieces, white_pieces, location)
 
-            #if check_jump(next_move):
-            #    current_state = ((next_move),(black_pieces, white_pieces, location))
-            #    return (next_move, evaluate_board(current_state, white_is_maximizer))
-
         #next state is a node of the tree
         next_states = get_next_states(current_state, color, level)
         #depending if it's your turn or the opponents, min or max the nodes
@@ -59,9 +56,18 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
             #returns min value choice
             #also ensures to pass back the "parent" current state and not the child's current state
             try:
+                #new_min_states = []
+                #for n in next_states:
+                    #min_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
+                    #(current_state, next_move) = min_states
+                    #(parent_next_move, parent_current_state) = current_state
+                   # (child_next_move, child_score) = next_move
+                   # new_min_states.append(child_score)
+                    #new_min_states.append(min_states)
 
-                #return min((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
-                (min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
+                #return min(new_min_states, key = first_element)
+
+                (min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl:tpl[1][1])
 
                 return (min_next_move, score)
             except EmptySequence:
@@ -69,16 +75,30 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
         else:
             #returns max value choice
             try:
+                #new_max_states = []
+                #for n in next_states:
+                    #max_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
+                    #(current_state, next_move) = max_states
+                    #(parent_next_move, parent_current_state) = current_state
+                    #(child_next_move, child_score) = next_move
+                    #new_max_states.append(child_score)
+                   # new_min_states.append(min_states)
 
-                #return max((dfs_game_tree_rec(n, level+1, color) for n in next_states), key = lambda a:a[1])
+                   # new_max_states.append(max_states)
+
+                #return max(new_max_states, key = first_element)
+
                 (max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
 
                 return (max_next_move, score)
             except EmptySequence:
                 return min_possible_value
 
+def first_element(tpl):
+    return tpl[0]
+
 def is_player(level):
-    if level%2 == 1:
+    if level%2 == 0:
         return True
     else:
         return False
@@ -189,6 +209,7 @@ def evaluate_board(current_state, white_is_maximizer):
     elif not min_pieces:
         return max_score
 
+
     max_valued_squares = ((3,2), (3,4), (5, 2), (5, 4), (2, 3), (4, 3),
                 (2, 5), (4, 5))
     somewhat_valued_squares = ((1,2), (1,4), (1,6), (2,1), (3,6), (4,1), (5,6), (6,1), (6,3), (6,5))
@@ -270,8 +291,8 @@ def evaluate_board(current_state, white_is_maximizer):
 
     value = (max_value - min_value)
 #    print("max value ", max_value, "min value ", min_value, "value ", value)
-
     return value
+
 
 
 def num_kings(pieces):
