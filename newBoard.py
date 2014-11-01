@@ -365,9 +365,14 @@ class Board:
         # -- Display computer move ---
         fromSq = fromCoordY * 4 + fromCoordX//2 + 1
         toSq = toCoordY * 4 + toCoordX//2 + 1
-        info = "Computer move: {} - {}".format(fromSq, toSq)
-        print("Computer move: {} - {}".format(fromSq, toSq))
-        self.gui.display("Computer move: {} - {}".format(fromSq, toSq))
+        if fromPiece.is_white:
+            color = "White"
+        else:
+            color = "Black"
+
+        info = color+" move: {} - {}".format(fromSq, toSq)
+        print(info)
+        self.gui.display(info)
 
         if fromCoordY - toCoordY == 2 or fromCoordY + toCoordY == 2 or fromCoordY - toCoordY == -2 or fromCoordY + toCoordY == -2:
             self.jumpFlag = 1

@@ -6,7 +6,7 @@ their turn or the computers
 import sys, pygame, threading
 from newBoard import Board
 #from board import Board
-#from multiprocessing import Process
+import _thread
 
 class Gui():
     """Main class responsible for all gui updates, including inputs - keyboard and move -"""
@@ -33,9 +33,9 @@ class Gui():
         self.h_play = pygame.image.load(img_folder+"human_play.png")
         self.h_play = pygame.transform.scale(self.h_play, self.psize)
         self.h_play.get_rect()
-        self.cpu_play = pygame.image.load(img_folder+"cpu_play.png")
-        self.cpu_play = pygame.transform.scale(self.cpu_play, self.psize)
-        self.cpu_play.get_rect()
+        self.cpu_play_img = pygame.image.load(img_folder+"cpu_play.png")
+        self.cpu_play_img = pygame.transform.scale(self.cpu_play_img, self.psize)
+        self.cpu_play_img.get_rect()
 
         # ------ TEXT VARS ---------
         self.max_display = 12
@@ -56,14 +56,16 @@ class Gui():
         self.pcolor = 0
 
         self.is_cpu_turn = True
+        self.cpu_is_playing = False
         self.player_is_white = False
-        self.computer_is_ready = False
 
         self.show_numbers = False
         self.piece_is_selected = False
         self.selected_number = 0
+
         self.top_display = 0
         self.playing = False
+        self.auto_playing = False
 
 
     def display(self, text):
@@ -86,7 +88,7 @@ class Gui():
         direction = 1
         self.playing = True
         while self.playing:
-            while turn == 0:
+            while True:
                 for event in pygame.event.get():
                     if pygame.key.get_mods() & pygame.KMOD_ALT:
                         self.show_numbers = True
@@ -135,12 +137,26 @@ class Gui():
                                 sys.exit(0)
                             elif self.typing_text == "undo" or self.typing_text == "u":
                                 pass
+                            elif self.typing_text.startswith("auto"):
+                                if not self.auto_playing:
+                                    _thread.start_new_thread(self.auto_play, ())
+                                self.auto_playing = True
+                                self.display(self.typing_text)
+                                self.display("Auto-play ON")
+                                self.typing_text = ""
+                            elif self.typing_text.startswith("manual"):
+                                self.auto_playing = False
+                                self.display(self.typing_text)
+                                self.display("Auto-play OFF")
+                                self.typing_text = ""
                             else:
                                 # ---- HUMAN PLAY ----#
-                                self.display(self.typing_text)
-                                if self.move(self.typing_text):
-                                    turn = 1
-                                self.typing_text = ""
+                                if not self.is_cpu_turn:
+                                    self.display(self.typing_text)
+                                    if self.move(self.typing_text):
+                                        self.is_cpu_turn = True
+                                        turn = 1
+                                    self.typing_text = ""
 
                         if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
                             self.typing_text = self.typing_text[:-1]
@@ -156,14 +172,16 @@ class Gui():
 
                 self.board.draw(self.inmenu)
 
-
                 fnt = pygame.font.SysFont("Calibri", self.font_size)
                 hintfnt = pygame.font.SysFont("monotype", self.font_size)
                 if self.inmenu:
                     self.screen.blit(self.menu, self.menurect)
                 else:
                     self.screen.blit(self.console, (self.bwidth, 0))
-                    self.screen.blit(self.cpu_play, (self.bwidth, 0))
+                    if self.is_cpu_turn:
+                        self.screen.blit(self.cpu_play_img, (self.bwidth, 0))
+                    else:
+                        self.screen.blit(self.h_play, (self.bwidth, 0))
                     # --- CONSOLE TEXT ---
                     # Show numbers
                     if self.show_numbers:
@@ -183,7 +201,6 @@ class Gui():
                     # - Input display
                     text = fnt.render(">> "+self.typing_text+"_", 1, (0, 0, 0))
                     self.screen.blit(text, (self.bwidth, (self.max_display-1)*self.theight + self.pheight))
-                    self.screen.blit(self.h_play, (self.bwidth, 0))
 
                     #-- Console display
                     i = 0
@@ -201,29 +218,25 @@ class Gui():
                                          (speed*text_offset, 0, self.twidth, self.theight))
                         i += 1
                         current_d += 1
+
+                    #- CPU play
+                    if self.is_cpu_turn:
+                        self.screen.blit(self.cpu_play_img, (self.bwidth, 0))
+
+                        #--- THREAD DRIVEN CPU PLAY ----------
+                        #""" Uncomment this line to set active
+                        if not self.cpu_is_playing:
+                            _thread.start_new_thread(self.cpu_play, ())
+                        self.cpu_is_playing = True
+                        #"""
+                        #-------------------
+                        #self.cpu_play() #dont forget to reactivate this line after
+                        if False:
+                            #TODO Use human moves-check function ^
+                            # IF HUMAN HAS NO MOVES (board.human_has_moves?)
+                            self.screen.blit(self.cpu_win, (0,0))
+                            self.after_game()
                 pygame.display.flip()
-            else:
-                self.screen.blit(self.cpu_play, (self.bwidth, 0))
-                computer_played = False
-
-                if self.player_is_white:
-                    computer_played = self.board.computer_turn("black")
-                    #computer_played = self.board.computerMove("black")
-                else:
-                    computer_played = self.board.computer_turn("white")
-                    #computer_played = self.board.computerMove("white")
-                if not computer_played:
-                    # IF CPU HAS NO MOVES
-                    self.screen.blit(self.human_win, (0,0))
-                    self.after_game()
-
-                if False:
-                    #TODO Use human moves-check function ^
-                    # IF HUMAN HAS NO MOVES (board.human_has_moves?)
-                    self.screen.blit(self.cpu_win, (0,0))
-                    self.after_game()
-
-            turn = 0
     def move(self, display_text):
         """
         Method for human play, through a string with the squares to use (Example: "23 11")
@@ -233,38 +246,38 @@ class Gui():
         """
         try:
             user_jump_exists = False
+            if not self.auto_playing:
+                if self.board.check_for_human_moves(self.player_is_white):
 
-            if self.board.check_for_human_moves(self.player_is_white):
+                    move_coords = self.typing_text.split(" ")
+                    coord1 = int(move_coords[0])# move([0],[1])
+                    coord2 = int(move_coords[1])
 
-                move_coords = self.typing_text.split(" ")
-                coord1 = int(move_coords[0])# move([0],[1])
-                coord2 = int(move_coords[1])
+                    #print(user_jump_exists)
+                    '''coords = eval(self.typing_text.split(" "))
+                    if type(coords) is tuple and all(type(n) is int for n in coords):
+                        self.board.human_controller(*coords)'''
 
-                #print(user_jump_exists)
-                '''coords = eval(self.typing_text.split(" "))
-                if type(coords) is tuple and all(type(n) is int for n in coords):
-                    self.board.human_controller(*coords)'''
+                    #elif(self.board.check_for_human_jumps(self.player_is_white)):
+                    if self.board.find_human_jumps(self.player_is_white):
+                        #the user must jump
 
-                #elif(self.board.check_for_human_jumps(self.player_is_white)):
-                if self.board.find_human_jumps(self.player_is_white):
-                    #the user must jump
-
-                    if self.board.is_jump(coord1, coord2, self.player_is_white):
-                        self.board.human_controller(coord1, coord2, self.player_is_white)
-                        if self.board.check_for_human_jumps(coord2):
-                            return False
+                        if self.board.is_jump(coord1, coord2, self.player_is_white):
+                            self.board.human_controller(coord1, coord2, self.player_is_white)
+                            if self.board.check_for_human_jumps(coord2):
+                                return False
+                            else:
+                                return True
                         else:
-                            return True
+                            raise Exception ("You must take a jump when the situation arises")
                     else:
-                        raise Exception ("You must take a jump when the situation arises")
+                        #no jump available, the user makes a normal use
+                        self.board.human_controller(coord1, coord2, self.player_is_white)
+                        return True
+                    #self.is_cpu_turn = True
+                    #return True
                 else:
-                    #no jump available, the user makes a normal use
-                    self.board.human_controller(coord1, coord2, self.player_is_white)
-                    return True
-                #self.is_cpu_turn = True
-                #return True
-            else:
-                raise Exception ("There are no valid moves left for the human player")
+                    raise Exception ("There are no valid moves left for the human player")
         except Exception as exp:
                 self.display("Invalid command - %s" %str(exp))
                 print (exp)
@@ -279,6 +292,33 @@ class Gui():
         """
         self.playing = False
         pygame.display.flip()
+
+    def auto_play(self):
+        while self.auto_playing:
+            if not self.is_cpu_turn:
+                print("Auto - Playing...")
+                if self.player_is_white:
+                    computer_played = self.board.computer_turn("white")
+                else:
+                    computer_played = self.board.computer_turn("black")
+                print("Auto - Played")
+            self.is_cpu_turn = True
+
+    def cpu_play(self):
+        print("CPU - Playing...")
+        if self.player_is_white:
+            computer_played = self.board.computer_turn("black")
+        else:
+            computer_played = self.board.computer_turn("white")
+        if not computer_played:
+            # IF CPU HAS NO MOVES
+            self.screen.blit(self.human_win, (0,0))
+            self.after_game()
+
+        print("CPU - Played!")
+        self.cpu_is_playing = False
+        self.is_cpu_turn = False
+
 if __name__ == '__main__':
     gui = Gui()
     gui.show()
