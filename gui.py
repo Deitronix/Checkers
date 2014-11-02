@@ -176,6 +176,7 @@ class Gui():
                 hintfnt = pygame.font.SysFont("monotype", self.font_size)
                 if self.inmenu:
                     self.screen.blit(self.menu, self.menurect)
+                    pygame.display.flip()
                 else:
                     self.screen.blit(self.console, (self.bwidth, 0))
                     if self.is_cpu_turn:
@@ -219,24 +220,24 @@ class Gui():
                         i += 1
                         current_d += 1
 
+                    pygame.display.flip()
                     #- CPU play
                     if self.is_cpu_turn:
                         self.screen.blit(self.cpu_play_img, (self.bwidth, 0))
 
                         #--- THREAD DRIVEN CPU PLAY ----------
-                        #""" Uncomment this line to set active
+                        """ Uncomment this line to set active
                         if not self.cpu_is_playing:
                             _thread.start_new_thread(self.cpu_play, ())
                         self.cpu_is_playing = True
                         #"""
                         #-------------------
-                        #self.cpu_play() #dont forget to reactivate this line after
+                        self.cpu_play() #dont forget to reactivate this line after
                         if False:
                             #TODO Use human moves-check function ^
                             # IF HUMAN HAS NO MOVES (board.human_has_moves?)
                             self.screen.blit(self.cpu_win, (0,0))
                             self.after_game()
-                pygame.display.flip()
     def move(self, display_text):
         """
         Method for human play, through a string with the squares to use (Example: "23 11")
