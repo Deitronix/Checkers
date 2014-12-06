@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="06dcbe07-f352-4975-9979-fbe187c2848e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/board.py" afterPath="$PROJECT_DIR$/board.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui.py" afterPath="$PROJECT_DIR$/gui.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/newBoard.py" afterPath="$PROJECT_DIR$/newBoard.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/states.py" afterPath="$PROJECT_DIR$/states.py" />
     </list>
     <ignored path="Checkers.iws" />
@@ -61,8 +58,8 @@
       <file leaf-file-name="states.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/states.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-10.124204" vertical-offset="6630" max-vertical-offset="12189">
-              <caret line="203" column="4" selection-start-line="203" selection-start-column="4" selection-end-line="203" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.43949044" vertical-offset="831" max-vertical-offset="12189">
+              <caret line="57" column="35" selection-start-line="57" selection-start-column="35" selection-end-line="57" selection-end-column="35" />
               <folding>
                 <element signature="e#2#13#0" expanded="true" />
               </folding>
@@ -396,7 +393,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="480" y="9" width="948" height="751" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -406,7 +403,7 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42741936" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4275668" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42741936" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42741936" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -441,18 +438,8 @@
           <line>7</line>
           <option name="timeStamp" value="624" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/states.py</url>
-          <line>59</line>
-          <option name="timeStamp" value="750" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/states.py</url>
-          <line>57</line>
-          <option name="timeStamp" value="751" />
-        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="753" />
+      <option name="time" value="754" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -852,8 +839,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/states.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.124204" vertical-offset="6630" max-vertical-offset="12189">
-          <caret line="203" column="4" selection-start-line="203" selection-start-column="4" selection-end-line="203" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.43949044" vertical-offset="831" max-vertical-offset="12189">
+          <caret line="57" column="35" selection-start-line="57" selection-start-column="35" selection-end-line="57" selection-end-column="35" />
           <folding>
             <element signature="e#2#13#0" expanded="true" />
           </folding>
