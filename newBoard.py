@@ -264,12 +264,12 @@ class Board:
                 self.jumpFlag = 0
                 return False
             elif jump:
-                '''if fromPiece.is_white and toCoordY ==0:#if it is made a king, stop jumping.
-                    self.jumpFlag = 0
-                    return False
-                elif not fromPiece.is_white and toCoordY == 7:
-                    self.jumpFlag = 0
-                    return False'''
+                #if fromPiece.is_white and toCoordY ==0:#if it is made a king, stop jumping.
+                #    self.jumpFlag = 0
+                #    return False
+               # elif not fromPiece.is_white and toCoordY == 7:
+                #    self.jumpFlag = 0
+                #    return False'''
                 if fromPiece.is_new_king:
                     fromPiece.is_new_king = False
                     self.jumpFlag = 0

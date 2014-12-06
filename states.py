@@ -112,34 +112,14 @@ def switch_color(color):
 
 def color_level(white, level):
 
-    if white and level == 0:
+    if (white and (level % 2 == 0)):
         color = "white"
-    elif white and level == 1:
+    elif (white and (level % 2 == 1)):
         color = "black"
-    elif white and level == 2:
+    elif(not white and (level % 2 == 0)):
+        color =  "black"
+    elif(not white and (level % 2 == 1)):
         color = "white"
-    elif white and level == 3:
-        color = "black"
-    elif white and level == 4:
-        color = "white"
-    elif white and level == 5:
-        color = "black"
-    elif white and level == 6:
-        color = "white"
-    elif not white and level == 0:
-        color = "black"
-    elif not white and level == 1:
-        color = "white"
-    elif not white and level == 2:
-        color = "black"
-    elif not white and level == 3:
-        color = "white"
-    elif not white and level == 4:
-        color = "black"
-    elif not white and level == 5:
-        color = "white"
-    elif not white and level == 6:
-        color = "black"
 
     return color
 
@@ -190,6 +170,7 @@ def my_min(seq, key=lambda a:a):
     return random.choice(min_acc)
 
 #def evaluate_board(current_state, color):
+##################################################################################################
 def evaluate_board(current_state, white_is_maximizer):
     ((fromCoord, toCoord), (black_pieces, white_pieces, location)) = current_state
     (fromCoordX, fromCoordY) = fromCoord
@@ -210,60 +191,60 @@ def evaluate_board(current_state, white_is_maximizer):
         return max_score
 
 
-    max_valued_squares = ((3,2), (3,4), (5, 2), (5, 4), (2, 3), (4, 3),
-                (2, 5), (4, 5))
-    somewhat_valued_squares = ((1,2), (1,4), (1,6), (2,1), (3,6), (4,1), (5,6), (6,1), (6,3), (6,5))
+    #max_valued_squares = ((3,2), (3,4), (5, 2), (5, 4), (2, 3), (4, 3),
+    #            (2, 5), (4, 5))
+    #somewhat_valued_squares = ((1,2), (1,4), (1,6), (2,1), (3,6), (4,1), (5,6), (6,1), (6,3), (6,5))
 
 
     max_sq_value = 0
     min_sq_value = 0
-    '''for piece in max_pieces:
-        (x, y) = piece._get_pos()
-        if (x,y) in max_valued_squares and len(max_pieces) > len(min_pieces):
-            max_sq_value += 5
-
-    for piece in min_pieces:
-        (x, y) = piece._get_pos()
-        if min_pieces in max_valued_squares and len(min_pieces) > len(max_pieces):
-            min_sq_value += 5
-
-    for piece in max_pieces:
-        (x,y) = piece._get_pos()
-        if (x,y) in somewhat_valued_squares and len(max_pieces) > len(min_pieces):
-            max_sq_value += 3
-    for piece in min_pieces:
-        (x,y) = piece._get_pos()
-        if(x,y) in somewhat_valued_squares and len(min_pieces)< len(max_pieces):
-            min_sq_value += 3'''
+    #for piece in max_pieces:
+    #    (x, y) = piece._get_pos()
+    #    if (x,y) in max_valued_squares and len(max_pieces) > len(min_pieces):
+    #        max_sq_value += 5
+    #
+    #for piece in min_pieces:
+    #    (x, y) = piece._get_pos()
+    #    if min_pieces in max_valued_squares and len(min_pieces) > len(max_pieces):
+    #        min_sq_value += 5
+    #
+    #for piece in max_pieces:
+    #    (x,y) = piece._get_pos()
+    #    if (x,y) in somewhat_valued_squares and len(max_pieces) > len(min_pieces):
+     #       max_sq_value += 3
+    #for piece in min_pieces:
+     #   (x,y) = piece._get_pos()
+     #   if(x,y) in somewhat_valued_squares and len(min_pieces)< len(max_pieces):
+      #      min_sq_value += 3'''
 
 
     max_kings = num_kings(max_pieces)
     min_kings = num_kings(min_pieces)
 
-    '''max_piece_value = 0
-    min_piece_value = 0
-    if len(max_pieces) > len(min_pieces)-1:
-        max_piece_value = 40
-        min_piece_value = -5
-    elif len(min_pieces)-1 > len(max_pieces):
-        max_piece_value = -40
-        min_piece_value = 5
-    else:
-        max_piece_value = 1
-        min_piece_value = 1
-    '''
+    #max_piece_value = 0
+    #min_piece_value = 0
+    #if len(max_pieces) > len(min_pieces)-1:
+    #    max_piece_value = 40
+    #    min_piece_value = -5
+    #elif len(min_pieces)-1 > len(max_pieces):
+    #    max_piece_value = -40
+    #    min_piece_value = 5
+    #else:
+    #    max_piece_value = 1
+    #    min_piece_value = 1
+    #
 
-    '''max_almost_king = 0
-    min_almost_king = 0
+    #max_almost_king = 0
+    #min_almost_king = 0
     #if len(max_pieces) <= 8 and len(max_pieces) >= 4:
-    for piece in max_pieces:
-        if piece.is_king:
-            continue
-        max_almost_king +=  distance_to_king(piece)
-    for piece in min_pieces:
-        if piece.is_king:
-            continue
-        min_almost_king += distance_to_king(piece)'''
+    #for piece in max_pieces:
+    #    if piece.is_king:
+    #        continue
+    #    max_almost_king +=  distance_to_king(piece)
+    #for piece in min_pieces:
+    #    if piece.is_king:
+    #        continue
+    #    min_almost_king += distance_to_king(piece)'''
 
     #my_distance = 0
     #if len(max_pieces) <= 6  and len(min_pieces) >= 6:
@@ -294,13 +275,13 @@ def evaluate_board(current_state, white_is_maximizer):
     return value
 
 
-
 def num_kings(pieces):
     my_king = 0
     for king in pieces:
         if king.is_king:
             my_king += 1
     return my_king
+
 
 def distance_to_king(piece):
     game_color = piece.get_color()
@@ -312,7 +293,7 @@ def distance_to_king(piece):
 
         if distance > 6:
             almost_king = 1
-        elif distance <=6 and distance > 4:
+        elif distance <= 6 and distance > 4:
             almost_king =5
         elif distance <=4 and distance > 2:
             almost_king = 10
