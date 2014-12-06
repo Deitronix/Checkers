@@ -11,8 +11,8 @@ min_possible_value = (-100001, -100000)
 
 min_score = -100000
 max_score = 100000
-max_alpha = 100000000000
-min_beta = -100000000000
+max_alpha = -100000000000
+min_beta = 100000000000
 
 MAX_DEPTH = 5
 
@@ -51,46 +51,59 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
         #next state is a node of the tree
         next_states = get_next_states(current_state, color, level)
         #depending if it's your turn or the opponents, min or max the nodes
+
         if is_player(level):
             #calling this method with new parameter values based off of some n in next_state
             #returns min value choice
             #also ensures to pass back the "parent" current state and not the child's current state
             try:
-                #new_min_states = []
-                #for n in next_states:
-                    #min_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
-                    #(current_state, next_move) = min_states
-                    #(parent_next_move, parent_current_state) = current_state
-                   # (child_next_move, child_score) = next_move
-                   # new_min_states.append(child_score)
-                    #new_min_states.append(min_states)
+                new_min_states = []
+                parent_score = 0
+                for n in next_states:
+                    min_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
+                    #if not level == 0:
+                    #    (min_states, (_, score)) = min_states
+                    #    parent_score = score
 
-                #return min(new_min_states, key = first_element)
+                    new_min_states.append(min_states)
 
-                (min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl:tpl[1][1])
-
+                (min_next_move, (_, score)) = my_max(new_min_states, key = lambda tpl: tpl[1][1])
                 return (min_next_move, score)
+
+                    #beta = my_min(new_min_states, key = first_element)
+                    #if beta <= alpha:
+                    #    break
+                #return beta
+
+                #(min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl:tpl[1][1])
+
+                #return (min_next_move, score)
             except EmptySequence:
                 return max_possible_value
         else:
             #returns max value choice
             try:
-                #new_max_states = []
-                #for n in next_states:
-                    #max_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
-                    #(current_state, next_move) = max_states
-                    #(parent_next_move, parent_current_state) = current_state
-                    #(child_next_move, child_score) = next_move
-                    #new_max_states.append(child_score)
-                   # new_min_states.append(min_states)
+                new_max_states = []
+                new_max_score = []
+                max_state_and_score = []
 
-                   # new_max_states.append(max_states)
+                for n in next_states:
+                    max_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
 
-                #return max(new_max_states, key = first_element)
+                    new_max_states.append(max_states)
 
-                (max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
-
+                (max_next_move, (_, score)) = my_max(new_max_states, key = lambda tpl: tpl[1][1])
                 return (max_next_move, score)
+
+                '''alpha = my_max(new_max_states, key = first_element)
+                    if beta <= alpha:
+                        break
+
+                return alpha'''
+
+                #(max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
+
+                #return (max_next_move, score)
             except EmptySequence:
                 return min_possible_value
 
@@ -98,7 +111,7 @@ def first_element(tpl):
     return tpl[0]
 
 def is_player(level):
-    if level%2 == 0:
+    if level%2 == 1:
         return True
     else:
         return False
@@ -240,30 +253,17 @@ def evaluate_board(current_state, white_is_maximizer):
     max_kings = num_kings(max_pieces)
     min_kings = num_kings(min_pieces)
 
-    '''max_piece_value = 0
-    min_piece_value = 0
-    if len(max_pieces) > len(min_pieces)-1:
-        max_piece_value = 40
-        min_piece_value = -5
-    elif len(min_pieces)-1 > len(max_pieces):
-        max_piece_value = -40
-        min_piece_value = 5
-    else:
-        max_piece_value = 1
-        min_piece_value = 1
-    '''
-
-    '''max_almost_king = 0
-    min_almost_king = 0
+    #max_almost_king = 0
+    #min_almost_king = 0
     #if len(max_pieces) <= 8 and len(max_pieces) >= 4:
-    for piece in max_pieces:
-        if piece.is_king:
-            continue
-        max_almost_king +=  distance_to_king(piece)
-    for piece in min_pieces:
-        if piece.is_king:
-            continue
-        min_almost_king += distance_to_king(piece)'''
+    #for piece in max_pieces:
+    #    if piece.is_king:
+    #        continue
+    #    max_almost_king +=  distance_to_king(piece)
+    #for piece in min_pieces:
+    #    if piece.is_king:
+    #        continue
+    #    min_almost_king += distance_to_king(piece)
 
     #my_distance = 0
     #if len(max_pieces) <= 6  and len(min_pieces) >= 6:
@@ -283,8 +283,8 @@ def evaluate_board(current_state, white_is_maximizer):
 
     #safe = is_move_safe((fromCoord, toCoordY),max_pieces, min_pieces)
 
-    #max_value = (max_piece_value + max_kings + max_sq_value + max_almost_king)
-    #min_value = (min_piece_value + min_kings + min_sq_value + min_almost_king)
+    #max_value = 100*(len(max_pieces)*3 + max_kings*5 + max_almost_king*2)
+    #min_value = 100*(len(min_pieces)*3 + min_kings*5 + min_almost_king*2)
 
     max_value = 100 * (len(max_pieces)*3 + max_kings*5)
     min_value = 100 * (len(min_pieces)*3 + min_kings*5)
@@ -308,7 +308,9 @@ def distance_to_king(piece):
 
     distance = 7 - y
     almost_king = 0
-    if game_color == "black":
+    if piece.is_king:
+        almost_king = 1
+    elif game_color == "black":
 
         if distance > 6:
             almost_king = 1
