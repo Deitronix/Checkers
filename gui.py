@@ -114,18 +114,18 @@ class Gui():
                             if self.board.collidepoint(pos):
                                 posx = pos[0]//self.board.pcwidth
                                 posy = pos[1]//self.board.pcheight
-                            '''    try:
-                                    # Add selection to piece movement
-                                    selected_piece = self.board.locations[(posx,posy)]
-                                    self.piece_is_selected = True
-                                    self.selected_number = posy * 4 + posx // 2 + 1
-                                except KeyError :
-                                    #no piece exists at that position
-                                    if selected_piece.is_white == self.player_is_white:
-                                        if self.piece_is_selected:
-                                            to_location = posy * 4 + posx // 2 + 1
-                                            self.move("{} {}".format(self.selected_number, to_location))
-                                    self.piece_is_selected = False'''
+                            #    try:
+                               #     # Add selection to piece movement
+                               #     selected_piece = self.board.locations[(posx,posy)]
+                               #     self.piece_is_selected = True
+                               #     self.selected_number = posy * 4 + posx // 2 + 1
+                               # except KeyError :
+                               #     #no piece exists at that position
+                               #     if selected_piece.is_white == self.player_is_white:
+                               #         if self.piece_is_selected:
+                               #             to_location = posy * 4 + posx // 2 + 1
+                               #             self.move("{} {}".format(self.selected_number, to_location))
+                               #     self.piece_is_selected = False
 
                     if event.type == pygame.KEYDOWN:
                         # if not self.is_cpu_turn:
@@ -226,10 +226,10 @@ class Gui():
                         self.screen.blit(self.cpu_play_img, (self.bwidth, 0))
 
                         #--- THREAD DRIVEN CPU PLAY ----------
-                        """ Uncomment this line to set active
-                        if not self.cpu_is_playing:
-                            _thread.start_new_thread(self.cpu_play, ())
-                        self.cpu_is_playing = True
+                        #Uncomment this line to set active
+                        #if not self.cpu_is_playing:
+                        #    _thread.start_new_thread(self.cpu_play, ())
+                        #self.cpu_is_playing = True
                         #"""
                         #-------------------
                         self.cpu_play() #dont forget to reactivate this line after
@@ -255,9 +255,9 @@ class Gui():
                     coord2 = int(move_coords[1])
 
                     #print(user_jump_exists)
-                    '''coords = eval(self.typing_text.split(" "))
-                    if type(coords) is tuple and all(type(n) is int for n in coords):
-                        self.board.human_controller(*coords)'''
+                    #coords = eval(self.typing_text.split(" "))
+                    #if type(coords) is tuple and all(type(n) is int for n in coords):
+                    #    self.board.human_controller(*coords)'''
 
                     #elif(self.board.check_for_human_jumps(self.player_is_white)):
                     if self.board.find_human_jumps(self.player_is_white):

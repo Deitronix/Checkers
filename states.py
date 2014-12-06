@@ -19,11 +19,6 @@ MAX_DEPTH = 5
 #acts as the minimax algorithm
 def dfs_game_tree_rec(current_state, level, white_is_maximizer):
 
-    #if white_is_maximizer:
-     #   color = "white"
-    #else:
-    #    color = "black"
-
     color = color_level(white_is_maximizer, level)
 
     if level == 0:
@@ -61,19 +56,12 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
                 parent_score = 0
                 for n in next_states:
                     min_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
-                    #if not level == 0:
-                    #    (min_states, (_, score)) = min_states
-                    #    parent_score = score
 
                     new_min_states.append(min_states)
 
                 (min_next_move, (_, score)) = my_max(new_min_states, key = lambda tpl: tpl[1][1])
                 return (min_next_move, score)
 
-                    #beta = my_min(new_min_states, key = first_element)
-                    #if beta <= alpha:
-                    #    break
-                #return beta
 
                 #(min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl:tpl[1][1])
 
@@ -84,8 +72,6 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
             #returns max value choice
             try:
                 new_max_states = []
-                new_max_score = []
-                max_state_and_score = []
 
                 for n in next_states:
                     max_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
@@ -95,20 +81,11 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
                 (max_next_move, (_, score)) = my_max(new_max_states, key = lambda tpl: tpl[1][1])
                 return (max_next_move, score)
 
-                '''alpha = my_max(new_max_states, key = first_element)
-                    if beta <= alpha:
-                        break
-
-                return alpha'''
-
                 #(max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
 
                 #return (max_next_move, score)
             except EmptySequence:
                 return min_possible_value
-
-def first_element(tpl):
-    return tpl[0]
 
 def is_player(level):
     if level%2 == 1:
@@ -116,43 +93,16 @@ def is_player(level):
     else:
         return False
 
-def switch_color(color):
-    if color == "black":
-        return "white"
-    elif color == "white":
-        return "black"
-
-
 def color_level(white, level):
 
-    if white and level == 0:
+    if (white and (level % 2 == 0)):
         color = "white"
-    elif white and level == 1:
+    elif (white and (level % 2 == 1)):
         color = "black"
-    elif white and level == 2:
+    elif(not white and (level % 2 == 0)):
+        color =  "black"
+    elif(not white and (level % 2 == 1)):
         color = "white"
-    elif white and level == 3:
-        color = "black"
-    elif white and level == 4:
-        color = "white"
-    elif white and level == 5:
-        color = "black"
-    elif white and level == 6:
-        color = "white"
-    elif not white and level == 0:
-        color = "black"
-    elif not white and level == 1:
-        color = "white"
-    elif not white and level == 2:
-        color = "black"
-    elif not white and level == 3:
-        color = "white"
-    elif not white and level == 4:
-        color = "black"
-    elif not white and level == 5:
-        color = "white"
-    elif not white and level == 6:
-        color = "black"
 
     return color
 
@@ -203,6 +153,7 @@ def my_min(seq, key=lambda a:a):
     return random.choice(min_acc)
 
 #def evaluate_board(current_state, color):
+##################################################################################################
 def evaluate_board(current_state, white_is_maximizer):
     ((fromCoord, toCoord), (black_pieces, white_pieces, location)) = current_state
     (fromCoordX, fromCoordY) = fromCoord
@@ -223,31 +174,31 @@ def evaluate_board(current_state, white_is_maximizer):
         return max_score
 
 
-    max_valued_squares = ((3,2), (3,4), (5, 2), (5, 4), (2, 3), (4, 3),
-                (2, 5), (4, 5))
-    somewhat_valued_squares = ((1,2), (1,4), (1,6), (2,1), (3,6), (4,1), (5,6), (6,1), (6,3), (6,5))
+    #max_valued_squares = ((3,2), (3,4), (5, 2), (5, 4), (2, 3), (4, 3),
+    #            (2, 5), (4, 5))
+    #somewhat_valued_squares = ((1,2), (1,4), (1,6), (2,1), (3,6), (4,1), (5,6), (6,1), (6,3), (6,5))
 
 
     max_sq_value = 0
     min_sq_value = 0
-    '''for piece in max_pieces:
-        (x, y) = piece._get_pos()
-        if (x,y) in max_valued_squares and len(max_pieces) > len(min_pieces):
-            max_sq_value += 5
-
-    for piece in min_pieces:
-        (x, y) = piece._get_pos()
-        if min_pieces in max_valued_squares and len(min_pieces) > len(max_pieces):
-            min_sq_value += 5
-
-    for piece in max_pieces:
-        (x,y) = piece._get_pos()
-        if (x,y) in somewhat_valued_squares and len(max_pieces) > len(min_pieces):
-            max_sq_value += 3
-    for piece in min_pieces:
-        (x,y) = piece._get_pos()
-        if(x,y) in somewhat_valued_squares and len(min_pieces)< len(max_pieces):
-            min_sq_value += 3'''
+    #for piece in max_pieces:
+    #    (x, y) = piece._get_pos()
+    #    if (x,y) in max_valued_squares and len(max_pieces) > len(min_pieces):
+    #        max_sq_value += 5
+    #
+    #for piece in min_pieces:
+    #    (x, y) = piece._get_pos()
+    #    if min_pieces in max_valued_squares and len(min_pieces) > len(max_pieces):
+    #        min_sq_value += 5
+    #
+    #for piece in max_pieces:
+    #    (x,y) = piece._get_pos()
+    #    if (x,y) in somewhat_valued_squares and len(max_pieces) > len(min_pieces):
+     #       max_sq_value += 3
+    #for piece in min_pieces:
+     #   (x,y) = piece._get_pos()
+     #   if(x,y) in somewhat_valued_squares and len(min_pieces)< len(max_pieces):
+      #      min_sq_value += 3'''
 
 
     max_kings = num_kings(max_pieces)
@@ -263,6 +214,7 @@ def evaluate_board(current_state, white_is_maximizer):
     #for piece in min_pieces:
     #    if piece.is_king:
     #        continue
+
     #    min_almost_king += distance_to_king(piece)
 
     #my_distance = 0
@@ -294,13 +246,13 @@ def evaluate_board(current_state, white_is_maximizer):
     return value
 
 
-
 def num_kings(pieces):
     my_king = 0
     for king in pieces:
         if king.is_king:
             my_king += 1
     return my_king
+
 
 def distance_to_king(piece):
     game_color = piece.get_color()
@@ -314,7 +266,7 @@ def distance_to_king(piece):
 
         if distance > 6:
             almost_king = 1
-        elif distance <=6 and distance > 4:
+        elif distance <= 6 and distance > 4:
             almost_king =5
         elif distance <=4 and distance > 2:
             almost_king = 10
