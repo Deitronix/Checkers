@@ -77,8 +77,7 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
                     max_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
 
                     new_max_states.append(max_states)
-                if level == 0:
-                    pass
+
                 #uncomment the line below for a random game
                 (max_next_move, (_, score)) = my_max(new_max_states, key = lambda tpl: tpl[1][1])
 
@@ -222,8 +221,8 @@ def evaluate_board(current_state, white_is_maximizer):
     max_kings = num_kings(max_pieces)
     min_kings = num_kings(min_pieces)
 
-    max_value = 100 * (len(max_pieces)*5 + max_kings*2)
-    min_value = 100 * (len(min_pieces)*5 + min_kings*2)
+    max_value = 100 * (len(max_pieces)*3 + max_kings*5)
+    min_value = 100 * (len(min_pieces)*3 + min_kings*5)
 
     value = (max_value - min_value)
 #    print("max value ", max_value, "min value ", min_value, "value ", value)
