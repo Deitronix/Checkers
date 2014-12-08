@@ -9,8 +9,8 @@ import pdb
 max_possible_value = (100001, 0)
 min_possible_value = (-100001, -100000)
 
-min_score = -100000
-max_score = 100000
+min_score = -1000000
+max_score = 1000000
 max_alpha = -100000000000
 min_beta = 100000000000
 
@@ -59,13 +59,13 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
 
                     new_min_states.append(min_states)
 
-                (min_next_move, (_, score)) = my_max(new_min_states, key = lambda tpl: tpl[1][1])
+                #uncomment the line below for a random game
+                (min_next_move, (_, score)) = my_min(new_min_states, key = lambda tpl: tpl[1][1])
+
+                #uncomment the line below for a static game
+                #(min_next_move, (_, score)) = min(new_min_states, key = lambda tpl: tpl[1][1])
                 return (min_next_move, score)
 
-
-                #(min_next_move, (_, score)) = my_min(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl:tpl[1][1])
-
-                #return (min_next_move, score)
             except EmptySequence:
                 return max_possible_value
         else:
@@ -77,13 +77,16 @@ def dfs_game_tree_rec(current_state, level, white_is_maximizer):
                     max_states = (n, dfs_game_tree_rec(n, level+1, white_is_maximizer))
 
                     new_max_states.append(max_states)
-
+                if level == 0:
+                    pass
+                #uncomment the line below for a random game
                 (max_next_move, (_, score)) = my_max(new_max_states, key = lambda tpl: tpl[1][1])
+
+                #uncomment the line below for a static game
+                #(max_next_move, (_,score)) = max(new_max_states, key = lambda tpl: tpl[1][1])
+
                 return (max_next_move, score)
 
-                #(max_next_move, (_, score)) = my_max(((n, dfs_game_tree_rec(n, level+1, white_is_maximizer)) for n in next_states), key = lambda tpl: tpl[1][1])
-
-                #return (max_next_move, score)
             except EmptySequence:
                 return min_possible_value
 
@@ -129,7 +132,6 @@ def my_max(seq, key=lambda a:a):
         elif comp == max_val:
             max_acc.append(v)
     return random.choice(max_acc)
-
 
 #if a min value has the same score, randomize which one it picks
 def my_min(seq, key=lambda a:a):
@@ -200,23 +202,6 @@ def evaluate_board(current_state, white_is_maximizer):
      #   if(x,y) in somewhat_valued_squares and len(min_pieces)< len(max_pieces):
       #      min_sq_value += 3'''
 
-
-    max_kings = num_kings(max_pieces)
-    min_kings = num_kings(min_pieces)
-
-    #max_almost_king = 0
-    #min_almost_king = 0
-    #if len(max_pieces) <= 8 and len(max_pieces) >= 4:
-    #for piece in max_pieces:
-    #    if piece.is_king:
-    #        continue
-    #    max_almost_king +=  distance_to_king(piece)
-    #for piece in min_pieces:
-    #    if piece.is_king:
-    #        continue
-
-    #    min_almost_king += distance_to_king(piece)
-
     #my_distance = 0
     #if len(max_pieces) <= 6  and len(min_pieces) >= 6:
     #    for piece2 in min_pieces:
@@ -232,19 +217,17 @@ def evaluate_board(current_state, white_is_maximizer):
     #        if distance < 2:
     #            my_distance -= 40
 
-
     #safe = is_move_safe((fromCoord, toCoordY),max_pieces, min_pieces)
 
-    #max_value = 100*(len(max_pieces)*3 + max_kings*5 + max_almost_king*2)
-    #min_value = 100*(len(min_pieces)*3 + min_kings*5 + min_almost_king*2)
+    max_kings = num_kings(max_pieces)
+    min_kings = num_kings(min_pieces)
 
-    max_value = 100 * (len(max_pieces)*3 + max_kings*5)
-    min_value = 100 * (len(min_pieces)*3 + min_kings*5)
+    max_value = 100 * (len(max_pieces)*5 + max_kings*2)
+    min_value = 100 * (len(min_pieces)*5 + min_kings*2)
 
     value = (max_value - min_value)
 #    print("max value ", max_value, "min value ", min_value, "value ", value)
     return value
-
 
 def num_kings(pieces):
     my_king = 0
@@ -252,40 +235,6 @@ def num_kings(pieces):
         if king.is_king:
             my_king += 1
     return my_king
-
-
-def distance_to_king(piece):
-    game_color = piece.get_color()
-    (x,y) = piece._get_pos()
-
-    distance = 7 - y
-    almost_king = 0
-    if piece.is_king:
-        almost_king = 1
-    elif game_color == "black":
-
-        if distance > 6:
-            almost_king = 1
-        elif distance <= 6 and distance > 4:
-            almost_king =5
-        elif distance <=4 and distance > 2:
-            almost_king = 10
-        elif distance <=2 and distance >=1:
-            almost_king = 15
-        elif distance == 0:
-            almost_king = 30
-    else:
-
-        if distance <=1 and distance > 2:
-            almost_king = 1
-        elif distance <=2 and distance >4:
-            almost_king = 5
-        elif distance <=4 and distance >6:
-            almost_king = 15
-        elif distance == 7:
-            almost_king = 30
-
-    return almost_king
 
 def copy_board(current_state):
     (black_pieces, white_pieces, locations) = current_state
